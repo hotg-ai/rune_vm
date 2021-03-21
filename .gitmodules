@@ -1,0 +1,9 @@
+[submodule "extern/wasm3"]
+	path = extern/wasm3
+	url = git@github.com:wasm3/wasm3.git
+[submodule "extern/fmt"]
+	path = extern/fmt
+	url = git@github.com:fmtlib/fmt.git
+[submodule "extern/mio"]
+	path = extern/mio
+	url = git@github.com:mandreyel/mio.git

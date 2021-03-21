@@ -1,0 +1,39 @@
+cmake_minimum_required(VERSION 3.15)
+
+# Sources & Headers
+set(
+    SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/Wasm3Engine.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Wasm3Runtime.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Wasm3Rune.cpp
+)
+set(
+    HEADERS
+    ${CMAKE_CURRENT_SOURCE_DIR}/Wasm3Engine.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Wasm3Runtime.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Wasm3Rune.hpp
+)
+
+add_library(${RUNE_VM_BACKEND_IMPL_TARGET} STATIC ${SOURCES} ${HEADERS})
+
+# Link public dependencies
+target_link_libraries(
+    ${RUNE_VM_BACKEND_IMPL_TARGET}
+    PUBLIC
+    fmt::fmt)
+
+# Link private dependencies
+target_link_libraries(
+    ${RUNE_VM_BACKEND_IMPL_TARGET}
+    PRIVATE
+    m3
+    wasm3_cpp
+    mio)
+
+
+# Add include directories
+target_include_directories(
+    ${RUNE_VM_BACKEND_IMPL_TARGET}
+    PUBLIC
+    ${RUNE_VM_INCLUDES_DIR}
+    ${RUNE_VM_SRC_DIR})

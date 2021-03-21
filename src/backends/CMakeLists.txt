@@ -1,0 +1,32 @@
+cmake_minimum_required(VERSION 3.15)
+
+# Options
+set(RUNE_VM_BACKEND "wasm3" CACHE STRING "WebAssembly backend to build with")
+set_property(CACHE RUNE_VM_BACKEND PROPERTY STRINGS wasm3)
+
+# Sources & Headers
+set(
+    SOURCES
+)
+set(
+    HEADERS
+    ${CMAKE_CURRENT_SOURCE_DIR}/Backends.hpp
+)
+
+add_library(${RUNE_VM_BACKEND_TARGET} STATIC ${SOURCES} ${HEADERS})
+
+# Include actual backend
+set(RUNE_VM_BACKEND_IMPL_TARGET rune_vm_backend_impl)
+if(${RUNE_VM_BACKEND} STREQUAL wasm3)
+    message(STATUS "Wasm3 backend was chosen")
+    add_subdirectory(wasm3)
+else()
+    message(ERROR "Unknown backend")
+endif()
+
+# Link actual backend
+target_link_libraries(
+    ${RUNE_VM_BACKEND_TARGET}
+    PUBLIC
+    fmt::fmt
+    ${RUNE_VM_BACKEND_IMPL_TARGET})
