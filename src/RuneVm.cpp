@@ -19,7 +19,7 @@ namespace rune_vm {
                 logger->log(
                     Severity::Error,
                     "rune_vm.cpp",
-                    fmt::format("Unknown backend was requested: {}", static_cast<std::underlying_type_t<Backend>>(backend)).c_str());
+                    fmt::format("Unknown backend was requested: {}", static_cast<std::underlying_type_t<Backend>>(backend)));
                 CHECK_THROW(false);
         }
     }

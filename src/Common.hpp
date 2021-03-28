@@ -10,6 +10,6 @@
 #define CHECK_THROW(cond)                                                   \
     do {                                                                    \
         if (!(cond)) {                                                      \
-            throw std::runtime_error("Check failed: " #cond " @" __FILE__); \
+            throw std::runtime_error("Check failed: " #cond " file: " __FILE__); \
         }                                                                   \
     } while (0)

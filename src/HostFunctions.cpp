@@ -7,18 +7,13 @@
 #include <HostFunctions.hpp>
 
 namespace rune_vm_internal::host_functions {
-    constexpr ValueType valueTypeFromInt(const uint32_t valueType) {
-        switch(valueType) {
-            case 1:
-                return ValueType::Int32;
-            case 2:
-                return ValueType::Float32;
-            case 5:
-                return ValueType::Uint8;
-            case 6:
-                return ValueType::Int16;
-        }
 
-        CHECK_THROW(false);
+    //
+    TCapabilityId requestCapability(IHostContext* context, const rune_interop::Capability capabilityType) noexcept {
+
+//        auto capability_idx = MANIFEST_->add_capability((hmr::CAPABILITY)capability_type);
+//        if (LOGSTREAM.is_open()) {
+//            LOGSTREAM << "Manifest::Capability request " << capability_type << std::endl;
     }
+
 }

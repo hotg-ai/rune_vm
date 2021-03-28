@@ -14,7 +14,7 @@ namespace rune_vm {
     }
 
     void LoggingModule::log(const Severity severity, const std::string_view message) const noexcept {
-        m_logger->log(severity, m_module, message)
+        m_logger->log(severity, m_module, message);
     }
 
     const ILogger::CPtr& LoggingModule::logger() const noexcept {

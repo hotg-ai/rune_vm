@@ -8,6 +8,7 @@
 #include <chrono>
 #include <cstdint>
 #include <optional>
+#include <tuple>
 #include <variant>
 #include <rune_vm/Log.hpp>
 
@@ -16,14 +17,17 @@ namespace rune_vm {
         Wasm3
     };
 
-    template<typename T>
+    template<typename T, typename TSize = uint64_t>
     struct DataView {
-        DataView(T* data, uint64_t size)
+        DataView(T* data, TSize size)
             : m_data(data)
             , m_size(size) {}
 
-        const T* m_data;
-        const uint64_t m_size;
+        // for tuple instantiation
+        DataView(): DataView(nullptr, 0) {}
+
+        T* m_data;
+        TSize m_size;
     };
 
     struct IResult {
@@ -74,8 +78,8 @@ namespace rune_vm {
         // contains wasm environment, logging function
         // if optional is not set for either of args, default values are used
         [[nodiscard]] virtual IRuntime::Ptr createRuntime(
-            const std::optional<uint32_t> optStackSizeBytes,
-            const std::optional<uint32_t> optMemoryLimit) = 0;
+            const std::optional<uint32_t> optStackSizeBytes = std::nullopt,
+            const std::optional<uint32_t> optMemoryLimi = std::nullopt) = 0;
     };
 
     [[nodiscard]] IEngine::Ptr createEngine(

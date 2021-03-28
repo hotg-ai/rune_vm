@@ -7,6 +7,7 @@
 
 #include <cstdint>
 #include <Capabilities.hpp>
+#include <RuneInterop.hpp>
 #include <rune_vm/RuneVm.hpp>
 
 namespace rune_vm_internal::host_functions {
@@ -14,57 +15,74 @@ namespace rune_vm_internal::host_functions {
 
     };
 
-    enum class ValueType: uint8_t {
-        Int32,
-        Float32,
-        Uint8,
-        Int16
-    };
-
-    constexpr ValueType valueTypeFromInt(const uint32_t valueType);
-
     // Host functions
-    using TCapabilityId = uint32_t;
-    using TModelId = uint32_t;
-    using TResult = uint32_t;
-    using TOutputId = uint32_t;
+    using TCapabilityId = rune_interop::TIntType;
+    using TModelId = rune_interop::TIntType;
+    using TResult = rune_interop::TIntType;
+    using TOutputId = rune_interop::TIntType;
 
     // // Setup helpers
-    TCapabilityId requestCapability(const Capability capabilityType, IHostContext* context = nullptr);
+    TCapabilityId requestCapability(IHostContext* context, const rune_interop::Capability capabilityType) noexcept;
     TResult requestCapabilitySetParam(
+        IHostContext* context,
         const TCapabilityId capabilityId,
         const rune_vm::DataView<const uint8_t> key,
         const rune_vm::DataView<const uint8_t> value,
-        const ValueType valueType,
-        IHostContext* context = nullptr);
+        const rune_interop::ValueType valueType) noexcept;
 
     // // Input helpers
     TResult requestProviderResponse(
+        IHostContext* context,
         const rune_vm::DataView<uint8_t> buffer,
-        const TCapabilityId capabilityId,
-        IHostContext* context = nullptr);
+        const TCapabilityId capabilityId) noexcept;
 
     // // Execution helpers
     TModelId tfmPreloadModel(
+        IHostContext* context,
         const rune_vm::DataView<const uint8_t> model,
         const uint32_t inputs,
-        const uint32_t outputs,
-        IHostContext* context = nullptr);
+        const uint32_t outputs) noexcept;
     TResult tfmModelInvoke(
+        IHostContext* context,
         const TModelId modelId,
         const rune_vm::DataView<const uint8_t> input,
-        const rune_vm::DataView<uint8_t> output,
-        IHostContext* context = nullptr);
+        const rune_vm::DataView<uint8_t> output) noexcept;
 
     // // Output helpers
-    TOutputId requestOutput(const uint32_t outputType, IHostContext* context = nullptr);
+    TOutputId requestOutput(IHostContext* context, const uint32_t outputType) noexcept;
     TResult consumeOutput(
+        IHostContext* context,
         const TOutputId outputId,
-        const rune_vm::DataView<const uint8_t> buffer,
-        IHostContext* context = nullptr);
+        const rune_vm::DataView<const uint8_t> buffer) noexcept;
 
     // // Debug helpers
-    TResult debug(const std::string_view message, IHostContext* context = nullptr);
+    TResult debug(IHostContext* context, const rune_vm::DataView<const char> message) noexcept;
+
+    // Link wasm names to actual functions
+    template<auto name>
+    constexpr auto nameToFunctionMap() noexcept {
+        constexpr auto stringViewName = std::string_view(name);
+
+        if constexpr(stringViewName == rune_interop::host_function_rune_name::g_requestCapability)
+            return requestCapability;
+        else if constexpr(stringViewName == rune_interop::host_function_rune_name::g_requestCapabilitySetParam)
+            return requestCapabilitySetParam;
+        else if constexpr(stringViewName == rune_interop::host_function_rune_name::g_requestProviderResponse)
+            return requestProviderResponse;
+        else if constexpr(stringViewName == rune_interop::host_function_rune_name::g_tfmPreloadModel)
+            return tfmPreloadModel;
+        else if constexpr(stringViewName == rune_interop::host_function_rune_name::g_tfmModelInvoke)
+            return tfmModelInvoke;
+        else if constexpr(stringViewName == rune_interop::host_function_rune_name::g_requestOutput)
+            return requestOutput;
+        else if constexpr(stringViewName == rune_interop::host_function_rune_name::g_consumeOutput)
+            return consumeOutput;
+        else if constexpr(stringViewName == rune_interop::host_function_rune_name::g_debug)
+            return debug;
+        else {
+            static_assert([](auto) { return false; }(stringViewName));
+        }
+    }
 }
 
 

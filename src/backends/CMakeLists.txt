@@ -13,7 +13,8 @@ set(
     ${CMAKE_CURRENT_SOURCE_DIR}/Backends.hpp
 )
 
-add_library(${RUNE_VM_BACKEND_TARGET} STATIC ${SOURCES} ${HEADERS})
+add_library(${RUNE_VM_BACKEND_TARGET} INTERFACE)
+#add_library(${RUNE_VM_BACKEND_TARGET} STATIC ${SOURCES} ${HEADERS})
 
 # Include actual backend
 set(RUNE_VM_BACKEND_IMPL_TARGET rune_vm_backend_impl)
@@ -27,6 +28,6 @@ endif()
 # Link actual backend
 target_link_libraries(
     ${RUNE_VM_BACKEND_TARGET}
-    PUBLIC
+    INTERFACE
     fmt::fmt
     ${RUNE_VM_BACKEND_IMPL_TARGET})

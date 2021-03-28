@@ -3,12 +3,14 @@ cmake_minimum_required(VERSION 3.15)
 # Sources & Headers
 set(
     SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/Wasm3Common.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Wasm3Engine.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Wasm3Runtime.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Wasm3Rune.cpp
 )
 set(
     HEADERS
+    ${CMAKE_CURRENT_SOURCE_DIR}/Wasm3Common.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Wasm3Engine.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Wasm3Runtime.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Wasm3Rune.hpp

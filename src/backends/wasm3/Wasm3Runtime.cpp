@@ -13,31 +13,26 @@
 #include <Common.hpp>
 #include <backends/wasm3/Wasm3Rune.hpp>
 #include <backends/wasm3/Wasm3Runtime.hpp>
+#include <backends/wasm3/Wasm3Common.hpp>
 
 namespace {
     using namespace rune_vm;
-
-    auto checkM3Error(const LoggingModule& log, M3Runtime& runtime, const M3Result& result) {
-        if(result != m3Err_none) {
-            auto info = M3ErrorInfo();
-
-            m3_GetErrorInfo(&runtime, &info);
-            CHECK_THROW(info.file && info.message);
-            log.log(
-                Severity::Error,
-                fmt::format("M3 function has failed: file={} line={} msg={}", info.file, info.line, info.message));
-            CHECK_THROW(false);
-        }
-    }
+    using namespace rune_vm_internal;
 
     auto createRune(
         const LoggingModule& log,
         M3Environment& environment,
-        M3Runtime& runtime,
+        std::shared_ptr<M3Runtime> runtime,
         const DataView<const uint8_t> data) {
         auto rawModule = IM3Module();
-        const auto parseResult = m3_ParseModule(&environment, &rawModule, data.m_data, data.m_size);
-        checkM3Error(log, runtime, parseResult);
+        checkedCall(
+            log,
+            runtime,
+            m3_ParseModule,
+            &environment,
+            &rawModule,
+            data.m_data,
+            data.m_size);
         CHECK_THROW(rawModule);
         auto loaded = std::make_shared<bool>(false);
         auto module = std::shared_ptr<M3Module>(
@@ -50,12 +45,16 @@ namespace {
             });
 
         // load into runtime
-        const auto loadResult = m3_LoadModule(&runtime, module.get());
-        checkM3Error(log, runtime, loadResult);
+        checkedCall(
+            log,
+            runtime,
+            m3_LoadModule,
+            runtime.get(),
+            module.get());
 
         *loaded = true;
 
-        return std::make_shared<rune_vm_internal::Wasm3Rune>(log.logger(), std::move(module));
+        return std::make_shared<rune_vm_internal::Wasm3Rune>(log.logger(), std::move(module), std::move(runtime));
     }
 
     auto createRuntime(
@@ -98,7 +97,7 @@ namespace rune_vm_internal {
     IRune::Ptr Wasm3Runtime::loadRune(const DataView<const uint8_t> data) {
         CHECK_THROW(data.m_data && data.m_size);
         m_log.log(Severity::Info, "loadRune from binary blob");
-        return createRune(m_log, *m_environment, *m_runtime, data);
+        return createRune(m_log, *m_environment, m_runtime, data);
     }
 
     IRune::Ptr Wasm3Runtime::loadRune(const std::string_view fileName) {
@@ -118,6 +117,6 @@ namespace rune_vm_internal {
         const auto mmapDataView = DataView<const uint8_t>(
             reinterpret_cast<const uint8_t*>(mmapedFile.data()),
             mmapedFile.size());
-        return createRune(m_log, *m_environment, *m_runtime, mmapDataView);
+        return createRune(m_log, *m_environment, m_runtime, mmapDataView);
     }
 }

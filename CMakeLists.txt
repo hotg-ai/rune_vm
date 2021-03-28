@@ -29,12 +29,14 @@ set(
     ${CMAKE_CURRENT_SOURCE_DIR}/src/RuneVm.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Log.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/HostFunctions.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/RuneInterop.cpp
 )
 set(
     HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/rune_vm/RuneVm.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/include/rune_vm/Log.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/HostFunctions.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/RuneInterop.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Common.hpp
 )
 

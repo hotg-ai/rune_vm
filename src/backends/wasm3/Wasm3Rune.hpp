@@ -6,13 +6,18 @@
 #pragma once
 
 #include <rune_vm/RuneVm.hpp>
+#include <HostFunctions.hpp>
 
 struct M3Module;
+struct M3Runtime;
 
 namespace rune_vm_internal {
-    class Wasm3Rune: public rune_vm::IRune {
+    class Wasm3Rune: public rune_vm::IRune, private host_functions::IHostContext {
     public:
-        Wasm3Rune(const rune_vm::ILogger::CPtr& logger, std::shared_ptr<M3Module> module);
+        Wasm3Rune(
+            const rune_vm::ILogger::CPtr& logger,
+            std::shared_ptr<M3Module> module,
+            std::shared_ptr<M3Runtime> runtime);
 
     private:
         // IRune
@@ -25,12 +30,13 @@ namespace rune_vm_internal {
         void callWaitResult(const std::chrono::microseconds) final;
 
         // internal
-        template<typename Ret, typename ... Args>
-        void link(const char* moduleName, const char* functionName, Ret (*function)(Args...));
+        template<auto functionName>
+        void link();
 
         // data
         rune_vm::LoggingModule m_log;
         std::shared_ptr<M3Module> m_module;
+        std::shared_ptr<M3Runtime> m_runtime;
     };
 }
 
