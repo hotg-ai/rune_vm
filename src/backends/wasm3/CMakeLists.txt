@@ -32,7 +32,6 @@ target_link_libraries(
     wasm3_cpp
     mio)
 
-
 # Add include directories
 target_include_directories(
     ${RUNE_VM_BACKEND_IMPL_TARGET}

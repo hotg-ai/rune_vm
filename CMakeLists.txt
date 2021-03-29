@@ -3,6 +3,7 @@ project(rune_vm)
 
 # Settings
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_FLAGS "-Werror=return-type")
 
 # Options
 option(RUNE_VM_INSTALL "To install or not to install. Might be useful if you add this library as submodule dep" ON)
@@ -22,6 +23,8 @@ set(RUNE_VM_INCLUDES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 set(RUNE_VM_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 set(RUNE_VM_BACKEND_TARGET rune_vm_backend)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/backends)
+set(RUNE_VM_CAPABILITIES_TARGET rune_vm_capabilities)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/capabilities)
 
 # Sources & Headers
 set(
@@ -35,6 +38,8 @@ set(
     HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/rune_vm/RuneVm.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/include/rune_vm/Log.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/rune_vm/Capabilities.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/rune_vm/VirtualInterface.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/HostFunctions.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/RuneInterop.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Common.hpp
@@ -46,10 +51,11 @@ add_library(${RUNE_VM_TARGET_NAME} STATIC ${SOURCES} ${HEADERS})
 
 # Link dependencies
 target_link_libraries(
-        ${RUNE_VM_TARGET_NAME}
-        PRIVATE
-        fmt::fmt
-        ${RUNE_VM_BACKEND_TARGET})
+    ${RUNE_VM_TARGET_NAME}
+    PRIVATE
+    fmt::fmt
+    ${RUNE_VM_BACKEND_TARGET}
+    ${RUNE_VM_CAPABILITIES_TARGET})
 
 # Installation rules
 if(RUNE_VM_INSTALL)

@@ -6,4 +6,5 @@
 #include "Capabilities.hpp"
 
 namespace rune_vm_internal {
+
 }

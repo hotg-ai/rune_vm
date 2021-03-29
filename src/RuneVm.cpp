@@ -10,6 +10,9 @@
 #include <Common.hpp>
 
 namespace rune_vm {
+    template<typename T>
+    VirtualInterface<T>::~VirtualInterface() = default;
+
     [[nodiscard]] IEngine::Ptr createEngine(const Backend backend, const ILogger::CPtr& logger) {
         CHECK_THROW(logger);
         switch(backend) {

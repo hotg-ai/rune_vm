@@ -9,28 +9,18 @@
 #include <cstdint>
 #include <optional>
 #include <tuple>
+#include <vector>
 #include <variant>
+#include <rune_vm/Capabilities.hpp>
 #include <rune_vm/Log.hpp>
+#include <rune_vm/VirtualInterface.hpp>
 
 namespace rune_vm {
     enum class Backend: uint8_t {
         Wasm3
     };
 
-    template<typename T, typename TSize = uint64_t>
-    struct DataView {
-        DataView(T* data, TSize size)
-            : m_data(data)
-            , m_size(size) {}
-
-        // for tuple instantiation
-        DataView(): DataView(nullptr, 0) {}
-
-        T* m_data;
-        TSize m_size;
-    };
-
-    struct IResult {
+    struct IResult : VirtualInterface<IResult> {
         enum class Type: uint8_t {
             Uint32,
             String,
@@ -43,15 +33,11 @@ namespace rune_vm {
         [[nodiscard]] virtual uint32_t count() const noexcept = 0;
     };
 
-    struct IRuneResultObserver {
-        using Ptr = std::shared_ptr<IRuneResultObserver>;
-
+    struct IRuneResultObserver : VirtualInterface<IRuneResultObserver> {
         virtual void update(IResult* result) const noexcept = 0;
     };
 
-    struct IRune {
-        using Ptr = std::shared_ptr<IRune>;
-
+    struct IRune : VirtualInterface<IRune> {
         // must be set for rune to be callable
         virtual void attachObserver(IRuneResultObserver::Ptr observer) = 0;
         virtual void detachObserver(IRuneResultObserver::Ptr observer) = 0;
@@ -62,19 +48,26 @@ namespace rune_vm {
         virtual void callWaitResult(const std::chrono::microseconds) = 0;
     };
 
-    struct IRuntime {
-        using Ptr = std::shared_ptr<IRuntime>;
-
+    struct IRuntime : VirtualInterface<IRuntime> {
         // accepts wasm
         // loads manifest
         // returns callable rune
-        [[nodiscard]] virtual IRune::Ptr loadRune(const DataView<const uint8_t> data) = 0;
-        [[nodiscard]] virtual IRune::Ptr loadRune(const std::string_view fileName) = 0;
+        //
+        // delegates - pass delegates, each providing some subset of capabilities.
+        // Subsets should not intersect, if that happens, delegate for capability with multiple delegates is chosen randomly
+        [[nodiscard]] virtual IRune::Ptr loadRune(
+            const std::vector<capabilities::IDelegate::Ptr>& delegates,
+            const DataView<const uint8_t> data) = 0;
+        [[nodiscard]] virtual IRune::Ptr loadRune(
+            const std::vector<capabilities::IDelegate::Ptr>& delegates,
+            const std::string_view fileName) = 0;
+
+        //
+        [[nodiscard]] virtual std::vector<capabilities::Capability>
+            getCapabilitiesWithDefaultDelegates() const noexcept = 0;
     };
 
-    struct IEngine {
-        using Ptr = std::shared_ptr<IEngine>;
-
+    struct IEngine : VirtualInterface<IEngine> {
         // contains wasm environment, logging function
         // if optional is not set for either of args, default values are used
         [[nodiscard]] virtual IRuntime::Ptr createRuntime(

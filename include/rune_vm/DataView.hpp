@@ -1,0 +1,24 @@
+//
+// Created by Kirill Delimbetov - github.com/delimbetov - on 29.03.2021
+// Copyright (c) HAMMER OF THE GODS INC. - hotg.ai
+//
+
+#pragma once
+
+#include <cstdint>
+
+namespace rune_vm {
+    template<typename T, typename TSize = uint64_t>
+    struct DataView {
+        DataView(T* data, TSize size)
+            : m_data(data)
+            , m_size(size) {}
+
+        // for tuple instantiation
+        DataView()
+            : DataView(nullptr, 0) {}
+
+        T* m_data;
+        TSize m_size;
+    };
+}

@@ -197,7 +197,8 @@ namespace rune_vm_internal {
     Wasm3Rune::Wasm3Rune(
         const rune_vm::ILogger::CPtr& logger,
         std::shared_ptr<M3Module> module,
-        std::shared_ptr<M3Runtime> runtime)
+        std::shared_ptr<M3Runtime> runtime,
+        const std::vector<rune_vm::capabilities::IDelegate::Ptr>& delegates)
         : m_log(logger, "Wasm3Rune")
         , m_module(std::move(module))
         , m_runtime(std::move(runtime)) {
@@ -265,5 +266,4 @@ namespace rune_vm_internal {
             wasm3_interop::wrap_helper<function>::wrap_fn,
             this);
     }
-
 }

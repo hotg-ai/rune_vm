@@ -8,7 +8,7 @@
 #include <cstdint>
 #include <Capabilities.hpp>
 #include <RuneInterop.hpp>
-#include <rune_vm/RuneVm.hpp>
+#include <rune_vm/Capabilities.hpp>
 
 namespace rune_vm_internal::host_functions {
     struct IHostContext {
@@ -16,10 +16,11 @@ namespace rune_vm_internal::host_functions {
     };
 
     // Host functions
-    using TCapabilityId = rune_interop::TIntType;
+    using TCapabilityId = rune_vm::capabilities::TId;
     using TModelId = rune_interop::TIntType;
     using TResult = rune_interop::TIntType;
     using TOutputId = rune_interop::TIntType;
+    static_assert(std::is_same_v<TCapabilityId, rune_interop::TIntType>);
 
     // // Setup helpers
     TCapabilityId requestCapability(IHostContext* context, const rune_interop::Capability capabilityType) noexcept;

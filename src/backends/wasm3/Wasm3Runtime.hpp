@@ -21,8 +21,15 @@ namespace rune_vm_internal {
 
     private:
         // IRune
-        [[nodiscard]] rune_vm::IRune::Ptr loadRune(const rune_vm::DataView<const uint8_t> data) final;
-        [[nodiscard]] rune_vm::IRune::Ptr loadRune(const std::string_view fileName) final;
+        [[nodiscard]] rune_vm::IRune::Ptr loadRune(
+            const std::vector<rune_vm::capabilities::IDelegate::Ptr>& delegates,
+            const rune_vm::DataView<const uint8_t> data) final;
+        [[nodiscard]] rune_vm::IRune::Ptr loadRune(
+            const std::vector<rune_vm::capabilities::IDelegate::Ptr>& delegates,
+            const std::string_view fileName) final;
+
+        [[nodiscard]] std::vector<rune_vm::capabilities::Capability>
+            getCapabilitiesWithDefaultDelegates() const noexcept final;
 
         // data
         rune_vm::LoggingModule m_log;

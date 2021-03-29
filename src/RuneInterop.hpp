@@ -7,6 +7,7 @@
 
 #include <cstdint>
 #include <string_view>
+#include <rune_vm/Capabilities.hpp>
 
 namespace rune_vm_internal::rune_interop {
     constexpr auto g_moduleName = "env";
@@ -26,13 +27,6 @@ namespace rune_vm_internal::rune_interop {
         constexpr const char g_manifest[] = "_manifest";
     }
 
-    enum class ValueType: uint8_t {
-        Int32,
-        Float32,
-        Uint8,
-        Int16
-    };
-
     enum class OutputType: uint8_t {
         Serial,
         Ble,
@@ -40,13 +34,8 @@ namespace rune_vm_internal::rune_interop {
         Wifi
     };
 
-    enum class Capability: uint8_t {
-        Rand,
-        Sound,
-        Accel,
-        Image,
-        Raw
-    };
+    using Capability = rune_vm::capabilities::Capability;
+    using ValueType = rune_vm::capabilities::ValueType;
 
     enum ReturnCode: uint32_t {
         RC_Invalid,

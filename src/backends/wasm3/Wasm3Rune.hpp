@@ -17,7 +17,8 @@ namespace rune_vm_internal {
         Wasm3Rune(
             const rune_vm::ILogger::CPtr& logger,
             std::shared_ptr<M3Module> module,
-            std::shared_ptr<M3Runtime> runtime);
+            std::shared_ptr<M3Runtime> runtime,
+            const std::vector<rune_vm::capabilities::IDelegate::Ptr>& delegates);
 
     private:
         // IRune
