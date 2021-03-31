@@ -15,6 +15,8 @@ namespace rune_vm_internal {
 
     class CapabilitiesDelegatesManager : public rune_vm::capabilities::IContext {
     public:
+        using Ptr = std::shared_ptr<CapabilitiesDelegatesManager>;
+
         CapabilitiesDelegatesManager(
             const rune_vm::ILogger::CPtr& logger,
             const std::vector<rune_vm::capabilities::IDelegate::Ptr>& delegates);

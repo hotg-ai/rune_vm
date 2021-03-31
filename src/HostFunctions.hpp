@@ -9,11 +9,27 @@
 #include <rune_vm/Capabilities.hpp>
 #include <rune_vm/Log.hpp>
 #include <capabilities/CapabilitiesDelegatesManager.hpp>
+#include <inference/Inference.hpp>
 #include <RuneInterop.hpp>
 
 namespace rune_vm_internal::host_functions {
-    struct IHostContext {
+    class HostContext {
+    public:
+        HostContext(
+            const rune_vm::ILogger::CPtr& logger,
+            CapabilitiesDelegatesManager::Ptr&& capabilitiesManager,
+            const inference::IRuntime::Ptr& inferenceRuntime);
 
+        const rune_vm::LoggingModule& log() const noexcept;
+        const CapabilitiesDelegatesManager::Ptr& capabilitiesManager() noexcept;
+        const CapabilitiesDelegatesManager::Ptr& capabilitiesManager() const noexcept;
+        const inference::IRuntime::Ptr& inferenceRuntime() noexcept;
+
+    private:
+        // data
+        rune_vm::LoggingModule m_log;
+        CapabilitiesDelegatesManager::Ptr m_capabilitiesManager;
+        inference::IRuntime::Ptr m_inferenceRuntime;
     };
 
     // Host functions
@@ -24,9 +40,9 @@ namespace rune_vm_internal::host_functions {
     static_assert(std::is_same_v<TCapabilityId, rune_interop::TIntType>);
 
     // // Setup helpers
-    TCapabilityId requestCapability(IHostContext* context, const rune_interop::Capability capabilityType) noexcept;
+    TCapabilityId requestCapability(HostContext* context, const rune_interop::Capability capabilityType) noexcept;
     TResult requestCapabilitySetParam(
-        IHostContext* context,
+        HostContext* context,
         const TCapabilityId capabilityId,
         const rune_vm::DataView<const uint8_t> key,
         const rune_vm::DataView<const uint8_t> value,
@@ -34,31 +50,31 @@ namespace rune_vm_internal::host_functions {
 
     // // Input helpers
     TResult requestProviderResponse(
-        IHostContext* context,
+        HostContext* context,
         const rune_vm::DataView<uint8_t> buffer,
         const TCapabilityId capabilityId) noexcept;
 
     // // Execution helpers
     TModelId tfmPreloadModel(
-        IHostContext* context,
+        HostContext* context,
         const rune_vm::DataView<const uint8_t> model,
         const uint32_t inputs,
         const uint32_t outputs) noexcept;
     TResult tfmModelInvoke(
-        IHostContext* context,
+        HostContext* context,
         const TModelId modelId,
         const rune_vm::DataView<const uint8_t> input,
         const rune_vm::DataView<uint8_t> output) noexcept;
 
     // // Output helpers
-    TOutputId requestOutput(IHostContext* context, const uint32_t outputType) noexcept;
+    TOutputId requestOutput(HostContext* context, const uint32_t outputType) noexcept;
     TResult consumeOutput(
-        IHostContext* context,
+        HostContext* context,
         const TOutputId outputId,
         const rune_vm::DataView<const uint8_t> buffer) noexcept;
 
     // // Debug helpers
-    TResult debug(IHostContext* context, const rune_vm::DataView<const char> message) noexcept;
+    TResult debug(HostContext* context, const rune_vm::DataView<const char> message) noexcept;
 
     // Link wasm names to actual functions
     template<auto name>

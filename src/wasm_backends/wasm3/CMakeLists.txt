@@ -16,24 +16,24 @@ set(
     ${CMAKE_CURRENT_SOURCE_DIR}/Wasm3Rune.hpp
 )
 
-add_library(${RUNE_VM_BACKEND_IMPL_TARGET} STATIC ${SOURCES} ${HEADERS})
+add_library(${RUNE_VM_WASM_BACKEND_IMPL_TARGET} STATIC ${SOURCES} ${HEADERS})
 
 # Link public dependencies
 target_link_libraries(
-    ${RUNE_VM_BACKEND_IMPL_TARGET}
+    ${RUNE_VM_WASM_BACKEND_IMPL_TARGET}
     PUBLIC
     fmt::fmt)
 
 # Link private dependencies
 target_link_libraries(
-    ${RUNE_VM_BACKEND_IMPL_TARGET}
+    ${RUNE_VM_WASM_BACKEND_IMPL_TARGET}
     PRIVATE
     m3
     mio)
 
 # Add include directories
 target_include_directories(
-    ${RUNE_VM_BACKEND_IMPL_TARGET}
+    ${RUNE_VM_WASM_BACKEND_IMPL_TARGET}
     PUBLIC
     ${RUNE_VM_INCLUDES_DIR}
     ${RUNE_VM_SRC_DIR})

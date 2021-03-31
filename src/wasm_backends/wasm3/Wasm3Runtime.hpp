@@ -17,7 +17,8 @@ namespace rune_vm_internal {
             const rune_vm::ILogger::CPtr& logger,
             const std::shared_ptr<M3Environment>& environment,
             const std::optional<uint32_t> optStackSizeBytes,
-            const std::optional<uint32_t> optMemoryLimit);
+            const std::optional<uint32_t> optMemoryLimit,
+            const inference::IRuntime::Ptr& inferenceRuntime);
 
     private:
         // IRune
@@ -35,6 +36,7 @@ namespace rune_vm_internal {
         rune_vm::LoggingModule m_log;
         std::shared_ptr<M3Environment> m_environment;
         std::shared_ptr<M3Runtime> m_runtime;
+        inference::IRuntime::Ptr m_inferenceRuntime;
     };
 }
 

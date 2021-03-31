@@ -11,10 +11,12 @@
 namespace rune_vm_internal {
     using namespace rune_vm;
 
-    Wasm3Engine::Wasm3Engine(const rune_vm::ILogger::CPtr& logger)
+    Wasm3Engine::Wasm3Engine(const rune_vm::ILogger::CPtr& logger, const inference::IRuntime::Ptr& inferenceRuntime)
         : m_log(logger, "Wasm3Engine")
-        , m_environment(m3_NewEnvironment(), m3_FreeEnvironment) {
+        , m_environment(m3_NewEnvironment(), m3_FreeEnvironment)
+        , m_inferenceRuntime(inferenceRuntime) {
         CHECK_THROW(m_environment);
+        CHECK_THROW(m_inferenceRuntime);
         m_log.log(Severity::Debug, "Wasm3Engine()");
     }
 
@@ -22,6 +24,11 @@ namespace rune_vm_internal {
     IRuntime::Ptr Wasm3Engine::createRuntime(
         const std::optional<uint32_t> optStackSizeBytes,
         const std::optional<uint32_t> optMemoryLimit) {
-        return std::make_shared<Wasm3Runtime>(m_log.logger(), m_environment, optStackSizeBytes, optMemoryLimit);
+        return std::make_shared<Wasm3Runtime>(
+            m_log.logger(),
+            m_environment,
+            optStackSizeBytes,
+            optMemoryLimit,
+            m_inferenceRuntime);
     }
 }

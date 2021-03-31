@@ -102,11 +102,11 @@ namespace {
             }
         };
 
-        template <typename Ret, typename ...Args, Ret (*Fn)(host_functions::IHostContext*, Args...)>
+        template <typename Ret, typename ...Args, Ret (*Fn)(host_functions::HostContext*, Args...)>
         struct wrap_helper<Fn> {
             static const void *wrap_fn(IM3Runtime rt, IM3ImportContext _ctx, TStackType sp, TMemType mem) {
                 Ret *ret_ptr = (Ret *) (sp);
-                auto* context = reinterpret_cast<host_functions::IHostContext*>(_ctx->userdata);
+                auto* context = reinterpret_cast<host_functions::HostContext*>(_ctx->userdata);
                 std::tuple<Args...> args;
                 try {
                     CHECK_THROW(context);
@@ -186,7 +186,7 @@ namespace {
         }
 
         template<typename Ret, typename ...Args>
-        constexpr auto getSignature(Ret (*)(host_functions::IHostContext*, Args...)) {
+        constexpr auto getSignature(Ret (*)(host_functions::HostContext*, Args...)) {
             return m3_signature<Ret, Args...>::value;
         }
     }
@@ -199,11 +199,15 @@ namespace rune_vm_internal {
         const rune_vm::ILogger::CPtr& logger,
         std::shared_ptr<M3Module> module,
         std::shared_ptr<M3Runtime> runtime,
-        std::shared_ptr<CapabilitiesDelegatesManager>&& manager)
+        const std::vector<rune_vm::capabilities::IDelegate::Ptr>& delegates,
+        const inference::IRuntime::Ptr& inferenceRuntime)
         : m_log(logger, "Wasm3Rune")
         , m_module(std::move(module))
         , m_runtime(std::move(runtime))
-        , m_manager(std::move(manager)) {
+        , m_hostContext(
+            logger,
+            std::make_shared<CapabilitiesDelegatesManager>(logger, delegates),
+            inferenceRuntime) {
         m_log.log(Severity::Debug, "Wasm3Rune()");
 
         // Link host functions
@@ -241,7 +245,7 @@ namespace rune_vm_internal {
 
     // IRune
     capabilities::IContext::Ptr Wasm3Rune::getCapabilitiesContext() const noexcept {
-        return m_manager;
+        return m_hostContext.capabilitiesManager();
     }
 
     void attachObserver(rune_vm::IRuneResultObserver::Ptr observer);
@@ -270,6 +274,6 @@ namespace rune_vm_internal {
             functionName,
             signature.data(),
             wasm3_interop::wrap_helper<function>::wrap_fn,
-            this);
+            &m_hostContext);
     }
 }

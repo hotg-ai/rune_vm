@@ -23,11 +23,14 @@ set(RUNE_VM_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 set(RUNE_VM_IO_TARGET rune_vm_io)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/io)
 # # wasm_backends
-set(RUNE_VM_BACKEND_TARGET rune_vm_backend)
+set(RUNE_VM_WASM_BACKEND_TARGET rune_vm_wasm_backend)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/wasm_backends)
 # # capabilities
 set(RUNE_VM_CAPABILITIES_TARGET rune_vm_capabilities)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/capabilities)
+# # inference
+set(RUNE_VM_INFERENCE_BACKEND_TARGET rune_vm_inference_backend)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/inference)
 
 # Sources & Headers
 set(
@@ -57,8 +60,9 @@ target_link_libraries(
     ${RUNE_VM_TARGET_NAME}
     PRIVATE
     fmt::fmt
-    ${RUNE_VM_BACKEND_TARGET}
-    ${RUNE_VM_CAPABILITIES_TARGET})
+    ${RUNE_VM_WASM_BACKEND_TARGET}
+    ${RUNE_VM_CAPABILITIES_TARGET}
+    ${RUNE_VM_INFERENCE_BACKEND_TARGET})
 
 # Installation rules
 if(RUNE_VM_INSTALL)

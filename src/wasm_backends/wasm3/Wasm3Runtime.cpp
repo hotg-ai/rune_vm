@@ -25,6 +25,7 @@ namespace {
         const LoggingModule& log,
         M3Environment& environment,
         std::shared_ptr<M3Runtime> runtime,
+        const inference::IRuntime::Ptr& inferenceRuntime,
         const std::vector<rune_vm::capabilities::IDelegate::Ptr>& delegates,
         const DataView<const uint8_t> data) {
         if(delegates.empty())
@@ -60,14 +61,13 @@ namespace {
 
         *loaded = true;
 
-        // Prepare delegates manager
-        auto manager = std::make_shared<CapabilitiesDelegatesManager>(log.logger(), delegates);
-
+        // Create delegates manager
         return std::make_shared<rune_vm_internal::Wasm3Rune>(
             log.logger(),
             std::move(module),
             std::move(runtime),
-            std::move(manager));
+            delegates,
+            inferenceRuntime);
     }
 
     auto createRuntime(
@@ -100,10 +100,12 @@ namespace rune_vm_internal {
         const ILogger::CPtr& logger,
         const std::shared_ptr<M3Environment>& environment,
         const std::optional<uint32_t> optStackSizeBytes,
-        const std::optional<uint32_t> optMemoryLimit)
+        const std::optional<uint32_t> optMemoryLimit,
+        const inference::IRuntime::Ptr& inferenceRuntime)
         : m_log(logger, "Wasm3Runtime")
         , m_environment(environment)
-        , m_runtime(createRuntime(m_log, m_environment, optStackSizeBytes, optMemoryLimit)) {
+        , m_runtime(createRuntime(m_log, m_environment, optStackSizeBytes, optMemoryLimit))
+        , m_inferenceRuntime(inferenceRuntime) {
         m_log.log(Severity::Debug, "Wasm3Runtime()");
     }
 
@@ -112,7 +114,7 @@ namespace rune_vm_internal {
         const DataView<const uint8_t> data) {
         CHECK_THROW(data.m_data && data.m_size);
         m_log.log(Severity::Info, "loadRune from binary blob");
-        return createRune(m_log, *m_environment, m_runtime, delegates, data);
+        return createRune(m_log, *m_environment, m_runtime, m_inferenceRuntime, delegates, data);
     }
 
     IRune::Ptr Wasm3Runtime::loadRune(
@@ -134,7 +136,7 @@ namespace rune_vm_internal {
         const auto mmapDataView = DataView<const uint8_t>(
             reinterpret_cast<const uint8_t*>(mmapedFile.data()),
             mmapedFile.size());
-        return createRune(m_log, *m_environment, m_runtime, delegates, mmapDataView);
+        return createRune(m_log, *m_environment, m_runtime, m_inferenceRuntime, delegates, mmapDataView);
     }
 
     std::vector<rune_vm::capabilities::Capability> Wasm3Runtime::getCapabilitiesWithDefaultDelegates() const noexcept {

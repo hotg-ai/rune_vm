@@ -16,7 +16,9 @@
 #include <rune_vm/VirtualInterface.hpp>
 
 namespace rune_vm {
-    enum class Backend: uint8_t {
+    using TThreadCount = uint32_t;
+
+    enum class WasmBackend: uint8_t {
         Wasm3
     };
 
@@ -78,6 +80,7 @@ namespace rune_vm {
     };
 
     [[nodiscard]] IEngine::Ptr createEngine(
-        const Backend backend,
-        const ILogger::CPtr& logger);
+        const ILogger::CPtr& logger,
+        const WasmBackend backend,
+        const TThreadCount inferenceThreadCount);
 }
