@@ -38,6 +38,8 @@ namespace rune_vm {
     };
 
     struct IRune : VirtualInterface<IRune> {
+        [[nodiscard]] virtual capabilities::IContext::Ptr getCapabilitiesContext() const noexcept = 0;
+
         // must be set for rune to be callable
         virtual void attachObserver(IRuneResultObserver::Ptr observer) = 0;
         virtual void detachObserver(IRuneResultObserver::Ptr observer) = 0;

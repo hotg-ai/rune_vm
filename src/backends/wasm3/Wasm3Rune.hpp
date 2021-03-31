@@ -7,6 +7,7 @@
 
 #include <rune_vm/RuneVm.hpp>
 #include <HostFunctions.hpp>
+#include <capabilities/CapabilitiesDelegatesManager.hpp>
 
 struct M3Module;
 struct M3Runtime;
@@ -18,10 +19,12 @@ namespace rune_vm_internal {
             const rune_vm::ILogger::CPtr& logger,
             std::shared_ptr<M3Module> module,
             std::shared_ptr<M3Runtime> runtime,
-            const std::vector<rune_vm::capabilities::IDelegate::Ptr>& delegates);
+            std::shared_ptr<CapabilitiesDelegatesManager>&& manager);
 
     private:
         // IRune
+        [[nodiscard]] virtual rune_vm::capabilities::IContext::Ptr getCapabilitiesContext() const noexcept final;
+
         void attachObserver(rune_vm::IRuneResultObserver::Ptr observer) final;
         void detachObserver(rune_vm::IRuneResultObserver::Ptr observer) final;
 
@@ -38,6 +41,7 @@ namespace rune_vm_internal {
         rune_vm::LoggingModule m_log;
         std::shared_ptr<M3Module> m_module;
         std::shared_ptr<M3Runtime> m_runtime;
+        std::shared_ptr<CapabilitiesDelegatesManager> m_manager;
     };
 }
 

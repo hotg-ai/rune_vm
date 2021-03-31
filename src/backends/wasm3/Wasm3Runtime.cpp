@@ -11,6 +11,8 @@
 //
 #include <mio/mmap.hpp>
 #include <Common.hpp>
+#include <capabilities/delegates/DelegateFactory.hpp>
+#include <capabilities/CapabilitiesDelegatesManager.hpp>
 #include <backends/wasm3/Wasm3Rune.hpp>
 #include <backends/wasm3/Wasm3Runtime.hpp>
 #include <backends/wasm3/Wasm3Common.hpp>
@@ -25,7 +27,6 @@ namespace {
         std::shared_ptr<M3Runtime> runtime,
         const std::vector<rune_vm::capabilities::IDelegate::Ptr>& delegates,
         const DataView<const uint8_t> data) {
-#error add default delegates somewhere here
         if(delegates.empty())
             log.log(Severity::Warning, "No delegates passed - that's very likely an error");
 
@@ -59,11 +60,14 @@ namespace {
 
         *loaded = true;
 
+        // Prepare delegates manager
+        auto manager = std::make_shared<CapabilitiesDelegatesManager>(log.logger(), delegates);
+
         return std::make_shared<rune_vm_internal::Wasm3Rune>(
             log.logger(),
             std::move(module),
             std::move(runtime),
-            delegates);
+            std::move(manager));
     }
 
     auto createRuntime(
@@ -134,6 +138,6 @@ namespace rune_vm_internal {
     }
 
     std::vector<rune_vm::capabilities::Capability> Wasm3Runtime::getCapabilitiesWithDefaultDelegates() const noexcept {
-#error ???
+        return getAllSupportedByDefaultCapabilities();
     }
 }

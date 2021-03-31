@@ -20,7 +20,6 @@ add_library(${RUNE_VM_CAPABILITIES_TARGET} STATIC ${SOURCES} ${HEADERS})
 target_link_libraries(
     ${RUNE_VM_CAPABILITIES_TARGET}
     PRIVATE
-    fmt::fmt
     ${RUNE_VM_CAPABILITIES_DELEGATES_TARGET})
 
 # Add include directories

@@ -53,7 +53,6 @@ namespace rune_vm::capabilities {
             const TKey& key) const noexcept = 0;
     };
 
-#error Perhaps make delegate unique for each capability? And also perhaps make it possible to set it to multiple runes at once? - the last one is questionable
     struct IDelegate : VirtualInterface<IDelegate> {
         // list of capabilities that are covered by this delegate
         // you may pass multiple delegates on the rune creation
@@ -65,9 +64,9 @@ namespace rune_vm::capabilities {
         [[nodiscard]] virtual bool requestCapability(
             const Capability capability,
             const TId newCapabilityId) noexcept = 0;
-        // notifies about capability parameter change
-        // return true if expected param is possible to set and false otherwise
-        [[nodiscard]] virtual bool capabilityParamChanged(
+        // request capability parameter change
+        // return true if new param is possible to set and false otherwise
+        [[nodiscard]] virtual bool requestCapabilityParamChange(
             const TId capabilityId,
             const TKey& key,
             const Parameter& parameter) noexcept = 0;

@@ -9,6 +9,7 @@ set(
 set(
     HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/RandomCapabilityDelegate.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/DelegateFactory.hpp
 )
 
 add_library(${RUNE_VM_CAPABILITIES_DELEGATES_TARGET} STATIC ${SOURCES} ${HEADERS})
@@ -17,7 +18,7 @@ add_library(${RUNE_VM_CAPABILITIES_DELEGATES_TARGET} STATIC ${SOURCES} ${HEADERS
 target_link_libraries(
     ${RUNE_VM_CAPABILITIES_DELEGATES_TARGET}
     PUBLIC
-    fmt::fmt)
+    ${RUNE_VM_IO_TARGET})
 
 # Add include directories
 target_include_directories(

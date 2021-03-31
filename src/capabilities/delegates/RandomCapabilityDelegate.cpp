@@ -4,25 +4,22 @@
 //
 
 #include <cmath>
-#include <fmt/core.h>
+#include <io/FormatCapabilitiesParameter.hpp>
 #include <Common.hpp>
 #include <capabilities/delegates/RandomCapabilityDelegate.hpp>
 
-namespace {
+namespace rune_vm_internal {
     using namespace rune_vm;
 
-    std::unordered_set<capabilities::Capability> g_supportedCapabilities = {capabilities::Capability::Rand};
-}
-
-namespace rune_vm_internal {
     RandomCapabilityDelegate::RandomCapabilityDelegate(const ILogger::CPtr& logger)
-        : m_log(logger, "RandomCapabilityDelegate") {
+        : m_log(logger, "RandomCapabilityDelegate")
+        , m_supportedCapabilities(supportedCapabilities().begin(), supportedCapabilities().end()) {
         m_log.log(Severity::Debug, "RandomCapabilityDelegate()");
     }
 
     // IDelegate
     std::unordered_set<capabilities::Capability> RandomCapabilityDelegate::getSupportedCapabilities() const noexcept {
-        return g_supportedCapabilities;
+        return m_supportedCapabilities;
     }
     
     bool RandomCapabilityDelegate::requestCapability(
@@ -37,7 +34,7 @@ namespace rune_vm_internal {
             return false;
         }
 
-        if(g_supportedCapabilities.count(capability) == 0) {
+        if(m_supportedCapabilities.count(capability) == 0) {
             m_log.log(
                 Severity::Error,
                 fmt::format("Requesting capability which is not supported", capability));
@@ -59,13 +56,13 @@ namespace rune_vm_internal {
         return true;
     }
 
-    bool RandomCapabilityDelegate::capabilityParamChanged(
+    bool RandomCapabilityDelegate::requestCapabilityParamChange(
         const capabilities::TId capabilityId,
         const capabilities::TKey& key,
         const capabilities::Parameter& parameter) noexcept {
         m_log.log(
             Severity::Debug,
-            fmt::format("capabilityParamChanged id={} key={} param={}", capabilityId, key, parameter));
+            fmt::format("requestCapabilityParamChange id={} key={} param={}", capabilityId, key, parameter));
         const auto [iter, found] = find(m_engines, capabilityId);
         if(!found) {
             m_log.log(

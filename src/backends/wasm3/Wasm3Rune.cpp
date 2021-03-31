@@ -6,10 +6,10 @@
 #include <array>
 #include <type_traits>
 #include <fmt/format.h>
+#include <m3_api_defs.h>
 #include <m3_api_wasi.h>
 #include <m3_env.h>
 #include <wasm3.h>
-#include <wasm3_cpp.h>
 #include <HostFunctions.hpp>
 #include <backends/wasm3/Wasm3Common.hpp>
 #include <backends/wasm3/Wasm3Rune.hpp>
@@ -198,10 +198,11 @@ namespace rune_vm_internal {
         const rune_vm::ILogger::CPtr& logger,
         std::shared_ptr<M3Module> module,
         std::shared_ptr<M3Runtime> runtime,
-        const std::vector<rune_vm::capabilities::IDelegate::Ptr>& delegates)
+        std::shared_ptr<CapabilitiesDelegatesManager>&& manager)
         : m_log(logger, "Wasm3Rune")
         , m_module(std::move(module))
-        , m_runtime(std::move(runtime)) {
+        , m_runtime(std::move(runtime))
+        , m_manager(std::move(manager)) {
         m_log.log(Severity::Debug, "Wasm3Rune()");
 
         // Link host functions
@@ -238,6 +239,10 @@ namespace rune_vm_internal {
     }
 
     // IRune
+    capabilities::IContext::Ptr Wasm3Rune::getCapabilitiesContext() const noexcept {
+        return m_manager;
+    }
+
     void attachObserver(rune_vm::IRuneResultObserver::Ptr observer);
     void detachObserver(rune_vm::IRuneResultObserver::Ptr observer);
 

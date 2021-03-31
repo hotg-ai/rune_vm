@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <array>
 #include <random>
 #include <unordered_map>
 #include <capabilities/CapabilitiesDelegatesManager.hpp>
@@ -12,6 +13,10 @@
 namespace rune_vm_internal {
     class RandomCapabilityDelegate : public rune_vm::capabilities::IDelegate {
     public:
+        static constexpr auto supportedCapabilities() noexcept {
+            return std::array{rune_vm::capabilities::Capability::Rand};
+        }
+
         RandomCapabilityDelegate(const rune_vm::ILogger::CPtr& logger);
 
     private:
@@ -21,7 +26,7 @@ namespace rune_vm_internal {
         [[nodiscard]] bool requestCapability(
             const rune_vm::capabilities::Capability capability,
             const rune_vm::capabilities::TId newCapabilityId) noexcept final;
-        [[nodiscard]] bool capabilityParamChanged(
+        [[nodiscard]] bool requestCapabilityParamChange(
             const rune_vm::capabilities::TId capabilityId,
             const rune_vm::capabilities::TKey& key,
             const rune_vm::capabilities::Parameter& parameter) noexcept final;
@@ -39,5 +44,6 @@ namespace rune_vm_internal {
         rune_vm::LoggingModule m_log;
         std::random_device m_randomDevice;
         std::unordered_map<rune_vm::capabilities::TId, CapabilityIdData> m_engines;
+        std::unordered_set<rune_vm::capabilities::Capability> m_supportedCapabilities;
     };
 }

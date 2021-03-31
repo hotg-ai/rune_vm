@@ -11,8 +11,6 @@ option(RUNE_VM_INSTALL "To install or not to install. Might be useful if you add
 # Add external dependencies
 ## wasm3-c
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/extern/wasm3/source ${CMAKE_CURRENT_BINARY_DIR}/extern/wasm3_m3)
-## wasm3-cpp
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/extern/wasm3/platforms/cpp/wasm3_cpp ${CMAKE_CURRENT_BINARY_DIR}/extern/wasm3_cpp)
 ## fmt
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/extern/fmt ${CMAKE_CURRENT_BINARY_DIR}/extern/fmt)
 ## mio
@@ -21,8 +19,13 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/extern/mio ${CMAKE_CURRENT_BINARY_D
 # Add internal subdirectories
 set(RUNE_VM_INCLUDES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 set(RUNE_VM_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
+# # io (formatting)
+set(RUNE_VM_IO_TARGET rune_vm_io)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/io)
+# # backends
 set(RUNE_VM_BACKEND_TARGET rune_vm_backend)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/backends)
+# # capabilities
 set(RUNE_VM_CAPABILITIES_TARGET rune_vm_capabilities)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/capabilities)
 

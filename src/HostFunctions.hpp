@@ -85,5 +85,3 @@ namespace rune_vm_internal::host_functions {
         }
     }
 }
-
-

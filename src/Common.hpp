@@ -20,6 +20,6 @@ namespace rune_vm_internal {
     auto find(TMap& map, const TKey& key) noexcept {
         const auto iter = map.find(key);
 
-        return std::make_tuple(iter, iter != map.end());
+        return std::make_pair(iter, iter != map.end());
     }
 }

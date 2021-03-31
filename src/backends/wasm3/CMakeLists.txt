@@ -29,7 +29,6 @@ target_link_libraries(
     ${RUNE_VM_BACKEND_IMPL_TARGET}
     PRIVATE
     m3
-    wasm3_cpp
     mio)
 
 # Add include directories
