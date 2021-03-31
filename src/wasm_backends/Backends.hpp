@@ -6,4 +6,4 @@
 #pragma once
 
 // include all backends here
-#include <backends/wasm3/Wasm3Engine.hpp>
+#include <wasm_backends/wasm3/Wasm3Engine.hpp>

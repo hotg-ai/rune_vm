@@ -13,9 +13,9 @@
 #include <Common.hpp>
 #include <capabilities/delegates/DelegateFactory.hpp>
 #include <capabilities/CapabilitiesDelegatesManager.hpp>
-#include <backends/wasm3/Wasm3Rune.hpp>
-#include <backends/wasm3/Wasm3Runtime.hpp>
-#include <backends/wasm3/Wasm3Common.hpp>
+#include <wasm_backends/wasm3/Wasm3Rune.hpp>
+#include <wasm_backends/wasm3/Wasm3Runtime.hpp>
+#include <wasm_backends/wasm3/Wasm3Common.hpp>
 
 namespace {
     using namespace rune_vm;

@@ -6,9 +6,10 @@
 #pragma once
 
 #include <cstdint>
-#include <Capabilities.hpp>
-#include <RuneInterop.hpp>
 #include <rune_vm/Capabilities.hpp>
+#include <rune_vm/Log.hpp>
+#include <capabilities/CapabilitiesDelegatesManager.hpp>
+#include <RuneInterop.hpp>
 
 namespace rune_vm_internal::host_functions {
     struct IHostContext {

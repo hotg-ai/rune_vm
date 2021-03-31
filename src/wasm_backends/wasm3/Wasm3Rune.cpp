@@ -10,9 +10,10 @@
 #include <m3_api_wasi.h>
 #include <m3_env.h>
 #include <wasm3.h>
+#include <Common.hpp>
 #include <HostFunctions.hpp>
-#include <backends/wasm3/Wasm3Common.hpp>
-#include <backends/wasm3/Wasm3Rune.hpp>
+#include <wasm_backends/wasm3/Wasm3Common.hpp>
+#include <wasm_backends/wasm3/Wasm3Rune.hpp>
 
 using namespace rune_vm_internal;
 

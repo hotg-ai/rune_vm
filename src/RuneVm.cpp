@@ -6,7 +6,7 @@
 #include <type_traits>
 #include <fmt/format.h>
 #include <rune_vm/RuneVm.hpp>
-#include <backends/Backends.hpp>
+#include <wasm_backends/Backends.hpp>
 #include <Common.hpp>
 
 namespace rune_vm {

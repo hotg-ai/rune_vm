@@ -10,7 +10,7 @@
 #include <fmt/format.h>
 #include <rune_vm/Log.hpp>
 #include <Common.hpp>
-#include <backends/wasm3/Wasm3Common.hpp>
+#include <wasm_backends/wasm3/Wasm3Common.hpp>
 
 namespace rune_vm_internal {
     void checkM3Error(

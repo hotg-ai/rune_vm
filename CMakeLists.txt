@@ -22,9 +22,9 @@ set(RUNE_VM_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 # # io (formatting)
 set(RUNE_VM_IO_TARGET rune_vm_io)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/io)
-# # backends
+# # wasm_backends
 set(RUNE_VM_BACKEND_TARGET rune_vm_backend)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/backends)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/wasm_backends)
 # # capabilities
 set(RUNE_VM_CAPABILITIES_TARGET rune_vm_capabilities)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/capabilities)

@@ -5,8 +5,8 @@
 
 #include <wasm3.h>
 #include <Common.hpp>
-#include <backends/wasm3/Wasm3Engine.hpp>
-#include <backends/wasm3/Wasm3Runtime.hpp>
+#include <wasm_backends/wasm3/Wasm3Engine.hpp>
+#include <wasm_backends/wasm3/Wasm3Runtime.hpp>
 
 namespace rune_vm_internal {
     using namespace rune_vm;
