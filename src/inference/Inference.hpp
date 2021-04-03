@@ -12,7 +12,14 @@ namespace rune_vm_internal::inference {
         TfLite
     };
 
-    struct IModel: rune_vm::VirtualInterface<IModel> {
+    struct IVisitor;
+
+    template<typename TBase, typename TVisitor>
+    struct IElement: TBase {
+        virtual void accept(TVisitor& visitor) noexcept = 0;
+    };
+
+    struct IModel: IElement<rune_vm::VirtualInterface<IModel>, IVisitor> {
 
     };
 

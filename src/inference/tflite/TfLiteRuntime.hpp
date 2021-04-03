@@ -10,27 +10,42 @@
 struct TfLiteModel;
 struct TfLiteInterpreterOptions;
 struct TfLiteInterpreter;
-struct TfLiteTensor;
 
 namespace rune_vm_internal::inference {
-
-    class TfLiteModel : public IModel {
+    class TfLiteLogger {
     public:
-        TfLiteModel(
-            rune_vm::LoggingModule&& loggingModule,
-            std::unique_ptr<TfLiteModel>&& model,
-            std::unique_ptr<TfLiteInterpreter>&& interpreter);
+        TfLiteLogger(const rune_vm::ILogger::CPtr& logger);
+
+        int log(const char* format, va_list args) const noexcept;
+
+    private:
+        rune_vm::LoggingModule m_log;
+    };
+
+    class TfLiteRuntimeModel : public IModel {
+    public:
+        TfLiteRuntimeModel(
+            const rune_vm::ILogger::CPtr& logger,
+            std::shared_ptr<TfLiteLogger>&& tfLogger,
+            std::shared_ptr<TfLiteModel>&& tfModel,
+            std::shared_ptr<TfLiteInterpreterOptions>&& tfOptions,
+            std::shared_ptr<TfLiteInterpreter>&& tfInterpreter);
 
         bool run(
             const rune_vm::DataView<rune_vm::DataView<const uint8_t>> inputs,
             const rune_vm::DataView<rune_vm::DataView<uint8_t>> outputs) noexcept;
 
     private:
+        // IElement
+        virtual void accept(IVisitor& visitor) noexcept final;
+
         // data
         rune_vm::LoggingModule m_log;
-        std::unique_ptr<TfLiteModel> m_model;
+        std::shared_ptr<TfLiteLogger> m_tfLogger;
+        std::shared_ptr<TfLiteModel> m_model;
+        std::shared_ptr<TfLiteInterpreterOptions> m_options;
         // interpreter is model-specific
-        std::unique_ptr<TfLiteInterpreter> m_interpreter;
+        std::shared_ptr<TfLiteInterpreter> m_interpreter;
     };
 
     class TfLiteRuntime : public IRuntime {
@@ -50,7 +65,7 @@ namespace rune_vm_internal::inference {
 
         // data
         rune_vm::LoggingModule m_log;
-        std::unique_ptr<TfLiteInterpreterOptions> m_options;
+        IRuntime::Options m_options;
     };
 }
 

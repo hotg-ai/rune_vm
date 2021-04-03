@@ -18,6 +18,18 @@ namespace rune_vm {
         DataView()
             : DataView(nullptr, 0) {}
 
+        auto& operator[](const size_t idx) const noexcept {
+            return m_data[idx];
+        }
+
+        auto begin() const noexcept {
+            return m_data;
+        }
+
+        auto end() const noexcept {
+            return m_data + m_size;
+        }
+
         T* m_data;
         TSize m_size;
     };
