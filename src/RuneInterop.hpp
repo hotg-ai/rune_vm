@@ -8,6 +8,7 @@
 #include <cstdint>
 #include <string_view>
 #include <rune_vm/Capabilities.hpp>
+#include <OutputManager.hpp>
 
 namespace rune_vm_internal::rune_interop {
     constexpr auto g_moduleName = "env";
@@ -27,19 +28,13 @@ namespace rune_vm_internal::rune_interop {
         constexpr const char g_manifest[] = "_manifest";
     }
 
-    enum class OutputType: uint8_t {
-        Serial,
-        Ble,
-        Pin,
-        Wifi
-    };
-
+    using OutputType = OutputType;
     using Capability = rune_vm::capabilities::Capability;
     using ValueType = rune_vm::capabilities::ValueType;
 
     enum ReturnCode: uint32_t {
-        RC_Invalid,
-        RC_InputError
+        RC_Invalid = static_cast<uint32_t>(-1),
+        RC_InputError = static_cast<uint32_t>(-2)
     };
 
     // in

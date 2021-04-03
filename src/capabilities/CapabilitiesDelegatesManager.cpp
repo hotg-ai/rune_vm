@@ -84,7 +84,7 @@ namespace rune_vm_internal {
         }
 
         auto& delegate = *optDelegate;
-        const auto allocatedCapabilityId = m_idCounter + m_idCounter;
+        const auto allocatedCapabilityId = m_idCounter + 1;
         const auto result = delegate->requestCapability(capability, allocatedCapabilityId);
         if(!result) {
             m_log.log(
@@ -107,6 +107,13 @@ namespace rune_vm_internal {
         m_log.log(
             Severity::Info,
             fmt::format("Capability={} created with id={}", capability, allocatedCapabilityId));
+
+        if(m_idCounter == std::numeric_limits<decltype(m_idCounter)>::max()) {
+            m_log.log(
+                Severity::Warning,
+                fmt::format("Capability id counter has hit max value={}. Next allocation will overflow it", m_idCounter));
+        }
+
         return allocatedCapabilityId;
     }
 

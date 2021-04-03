@@ -9,7 +9,8 @@
 #include <rune_vm/Capabilities.hpp>
 #include <rune_vm/Log.hpp>
 #include <capabilities/CapabilitiesDelegatesManager.hpp>
-#include <inference/Inference.hpp>
+#include <inference/ModelManager.hpp>
+#include <OutputManager.hpp>
 #include <RuneInterop.hpp>
 
 namespace rune_vm_internal::host_functions {
@@ -18,25 +19,27 @@ namespace rune_vm_internal::host_functions {
         HostContext(
             const rune_vm::ILogger::CPtr& logger,
             CapabilitiesDelegatesManager::Ptr&& capabilitiesManager,
-            const inference::IRuntime::Ptr& inferenceRuntime);
+            const inference::ModelManager::Ptr& modelManager);
 
         const rune_vm::LoggingModule& log() const noexcept;
         const CapabilitiesDelegatesManager::Ptr& capabilitiesManager() noexcept;
         const CapabilitiesDelegatesManager::Ptr& capabilitiesManager() const noexcept;
-        const inference::IRuntime::Ptr& inferenceRuntime() noexcept;
+        const inference::ModelManager::Ptr& modelManager() noexcept;
+        OutputManager& outputManager() noexcept;
 
     private:
         // data
         rune_vm::LoggingModule m_log;
         CapabilitiesDelegatesManager::Ptr m_capabilitiesManager;
-        inference::IRuntime::Ptr m_inferenceRuntime;
+        inference::ModelManager::Ptr m_modelManager;
+        OutputManager m_outputManager;
     };
 
     // Host functions
     using TCapabilityId = rune_vm::capabilities::TId;
-    using TModelId = rune_interop::TIntType;
+    using TModelId = inference::TModelId;
     using TResult = rune_interop::TIntType;
-    using TOutputId = rune_interop::TIntType;
+    using TOutputId = TOutputId;
     static_assert(std::is_same_v<TCapabilityId, rune_interop::TIntType>);
 
     // // Setup helpers
@@ -67,7 +70,7 @@ namespace rune_vm_internal::host_functions {
         const rune_vm::DataView<uint8_t> output) noexcept;
 
     // // Output helpers
-    TOutputId requestOutput(HostContext* context, const uint32_t outputType) noexcept;
+    TOutputId requestOutput(HostContext* context, const rune_interop::OutputType outputType) noexcept;
     TResult consumeOutput(
         HostContext* context,
         const TOutputId outputId,

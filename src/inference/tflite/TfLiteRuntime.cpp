@@ -17,7 +17,7 @@ namespace rune_vm_internal::inference {
 
     struct RunVisitor: IVisitor {
         RunVisitor(
-            const rune_vm::DataView<rune_vm::DataView<const uint8_t>> inputs,
+            const rune_vm::DataView<const rune_vm::DataView<const uint8_t>> inputs,
             const rune_vm::DataView<rune_vm::DataView<uint8_t>> outputs)
             : m_inputs(inputs)
             , m_outputs(outputs) {}
@@ -31,7 +31,7 @@ namespace rune_vm_internal::inference {
         }
 
     private:
-        rune_vm::DataView<rune_vm::DataView<const uint8_t>> m_inputs;
+        rune_vm::DataView<const rune_vm::DataView<const uint8_t>> m_inputs;
         rune_vm::DataView<rune_vm::DataView<uint8_t>> m_outputs;
         bool m_result;
     };
@@ -67,7 +67,7 @@ namespace rune_vm_internal::inference {
     }
 
     bool TfLiteRuntimeModel::run(
-        const rune_vm::DataView<rune_vm::DataView<const uint8_t>> inputs,
+        const rune_vm::DataView<const rune_vm::DataView<const uint8_t>> inputs,
         const rune_vm::DataView<rune_vm::DataView<uint8_t>> outputs) noexcept {
         try {
             // Write input into tensors
@@ -139,7 +139,7 @@ namespace rune_vm_internal::inference {
     // IRuntime
     bool TfLiteRuntime::run(
         const IModel::Ptr& model,
-        const rune_vm::DataView<rune_vm::DataView<const uint8_t>> inputs,
+        const rune_vm::DataView<const rune_vm::DataView<const uint8_t>> inputs,
         const rune_vm::DataView<rune_vm::DataView<uint8_t>> outputs) noexcept {
         auto visitor = RunVisitor(inputs, outputs);
 

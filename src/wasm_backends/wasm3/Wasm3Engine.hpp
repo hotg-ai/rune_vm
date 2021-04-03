@@ -6,14 +6,14 @@
 #pragma once
 
 #include <rune_vm/RuneVm.hpp>
-#include <inference/Inference.hpp>
+#include <inference/ModelManager.hpp>
 
 struct M3Environment;
 
 namespace rune_vm_internal {
     class Wasm3Engine: public rune_vm::IEngine {
     public:
-        Wasm3Engine(const rune_vm::ILogger::CPtr& logger, const inference::IRuntime::Ptr& inferenceRuntime);
+        Wasm3Engine(const rune_vm::ILogger::CPtr& logger, const inference::ModelManager::Ptr& modelManager);
 
     private:
         // rune_vm::IEngine
@@ -24,6 +24,6 @@ namespace rune_vm_internal {
         // data
         rune_vm::LoggingModule m_log;
         std::shared_ptr<M3Environment> m_environment;
-        inference::IRuntime::Ptr m_inferenceRuntime;
+        inference::ModelManager::Ptr m_modelManager;
     };
 }

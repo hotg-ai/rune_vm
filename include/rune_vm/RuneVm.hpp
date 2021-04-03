@@ -30,26 +30,17 @@ namespace rune_vm {
             IResult
         };
 
-        [[nodiscard]] virtual std::variant<uint32_t, std::string_view, DataView<const uint8_t>, IResult*> getAt(const uint32_t idx) const = 0;
+        // NOTE: variant contains unowned references to internal data. Please don't use after IResult::Ptr release
+        using TVariant = std::variant<uint32_t, std::string_view, DataView<const uint8_t>, IResult::Ptr>;
+
+        [[nodiscard]] virtual TVariant getAt(const uint32_t idx) const = 0;
         [[nodiscard]] virtual Type typeAt(const uint32_t idx) const = 0;
         [[nodiscard]] virtual uint32_t count() const noexcept = 0;
     };
 
-    struct IRuneResultObserver : VirtualInterface<IRuneResultObserver> {
-        virtual void update(IResult* result) const noexcept = 0;
-    };
-
     struct IRune : VirtualInterface<IRune> {
         [[nodiscard]] virtual capabilities::IContext::Ptr getCapabilitiesContext() const noexcept = 0;
-
-        // must be set for rune to be callable
-        virtual void attachObserver(IRuneResultObserver::Ptr observer) = 0;
-        virtual void detachObserver(IRuneResultObserver::Ptr observer) = 0;
-
-        // calls without waiting for observer call
-        virtual void call() = 0;
-        // calls and waits for the observer to be called
-        virtual void callWaitResult(const std::chrono::microseconds) = 0;
+        [[nodiscard]] virtual IResult::Ptr call() = 0;
     };
 
     struct IRuntime : VirtualInterface<IRuntime> {

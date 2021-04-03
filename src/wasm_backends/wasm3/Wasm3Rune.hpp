@@ -20,19 +20,12 @@ namespace rune_vm_internal {
             std::shared_ptr<M3Module> module,
             std::shared_ptr<M3Runtime> runtime,
             const std::vector<rune_vm::capabilities::IDelegate::Ptr>& delegates,
-            const inference::IRuntime::Ptr& inferenceRuntime);
+            const inference::ModelManager::Ptr& modelManager);
 
     private:
         // IRune
-        [[nodiscard]] virtual rune_vm::capabilities::IContext::Ptr getCapabilitiesContext() const noexcept final;
-
-        void attachObserver(rune_vm::IRuneResultObserver::Ptr observer) final;
-        void detachObserver(rune_vm::IRuneResultObserver::Ptr observer) final;
-
-        // calls without waiting for observer call
-        void call() final;
-        // calls and waits for the observer to be called
-        void callWaitResult(const std::chrono::microseconds) final;
+        [[nodiscard]] rune_vm::capabilities::IContext::Ptr getCapabilitiesContext() const noexcept final;
+        [[nodiscard]] rune_vm::IResult::Ptr call() final;
 
         // internal
         template<auto functionName>

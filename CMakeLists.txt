@@ -39,6 +39,8 @@ set(
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Log.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/HostFunctions.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/RuneInterop.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Result.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/OutputManager.cpp
 )
 set(
     HEADERS
@@ -48,6 +50,8 @@ set(
     ${CMAKE_CURRENT_SOURCE_DIR}/include/rune_vm/VirtualInterface.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/HostFunctions.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/RuneInterop.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Result.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/OutputManager.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Common.hpp
 )
 

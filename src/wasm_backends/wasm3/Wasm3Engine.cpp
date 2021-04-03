@@ -11,12 +11,12 @@
 namespace rune_vm_internal {
     using namespace rune_vm;
 
-    Wasm3Engine::Wasm3Engine(const rune_vm::ILogger::CPtr& logger, const inference::IRuntime::Ptr& inferenceRuntime)
+    Wasm3Engine::Wasm3Engine(const rune_vm::ILogger::CPtr& logger, const inference::ModelManager::Ptr& modelManager)
         : m_log(logger, "Wasm3Engine")
         , m_environment(m3_NewEnvironment(), m3_FreeEnvironment)
-        , m_inferenceRuntime(inferenceRuntime) {
+        , m_modelManager(modelManager) {
         CHECK_THROW(m_environment);
-        CHECK_THROW(m_inferenceRuntime);
+        CHECK_THROW(m_modelManager);
         m_log.log(Severity::Debug, "Wasm3Engine()");
     }
 
@@ -29,6 +29,6 @@ namespace rune_vm_internal {
             m_environment,
             optStackSizeBytes,
             optMemoryLimit,
-            m_inferenceRuntime);
+            m_modelManager);
     }
 }

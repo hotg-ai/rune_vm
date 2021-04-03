@@ -30,7 +30,7 @@ namespace rune_vm_internal::inference {
 
         virtual bool run(
             const IModel::Ptr& model,
-            const rune_vm::DataView<rune_vm::DataView<const uint8_t>> inputs,
+            const rune_vm::DataView<const rune_vm::DataView<const uint8_t>> inputs,
             const rune_vm::DataView<rune_vm::DataView<uint8_t>> outputs) noexcept = 0;
         virtual IModel::Ptr loadModel(
             const rune_vm::DataView<const uint8_t> model,

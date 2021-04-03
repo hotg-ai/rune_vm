@@ -200,14 +200,14 @@ namespace rune_vm_internal {
         std::shared_ptr<M3Module> module,
         std::shared_ptr<M3Runtime> runtime,
         const std::vector<rune_vm::capabilities::IDelegate::Ptr>& delegates,
-        const inference::IRuntime::Ptr& inferenceRuntime)
+        const inference::ModelManager::Ptr& modelManager)
         : m_log(logger, "Wasm3Rune")
         , m_module(std::move(module))
         , m_runtime(std::move(runtime))
         , m_hostContext(
             logger,
             std::make_shared<CapabilitiesDelegatesManager>(logger, delegates),
-            inferenceRuntime) {
+            modelManager) {
         m_log.log(Severity::Debug, "Wasm3Rune()");
 
         // Link host functions
@@ -248,13 +248,9 @@ namespace rune_vm_internal {
         return m_hostContext.capabilitiesManager();
     }
 
-    void attachObserver(rune_vm::IRuneResultObserver::Ptr observer);
-    void detachObserver(rune_vm::IRuneResultObserver::Ptr observer);
-
-    // calls without waiting for observer call
-    void call();
-    // calls and waits for the observer to be called
-    void callWaitResult(const std::chrono::microseconds);
+    IResult::Ptr Wasm3Rune::call() {
+#error impl
+    }
 
     // Internal
     template<auto functionName>

@@ -9,10 +9,12 @@ set_property(CACHE RUNE_VM_INFERENCE_BACKEND PROPERTY STRINGS tflite)
 set(
     SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/Inference.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/ModelManager.cpp
 )
 set(
     HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/Inference.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/ModelManager.hpp
 )
 
 # Add target

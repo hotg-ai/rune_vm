@@ -6,7 +6,7 @@
 #include <fmt/format.h>
 #include <rune_vm/RuneVm.hpp>
 #include <wasm_backends/Backends.hpp>
-#include <inference/Inference.hpp>
+#include <inference/ModelManager.hpp>
 #include <Common.hpp>
 
 namespace rune_vm {
@@ -24,9 +24,12 @@ namespace rune_vm {
             logger,
             inference::InferenceBackend::TfLite,
             inferenceOptions);
+        // TODO: model manager should not be owned by wasm engine
+        const auto modelManager = std::make_shared<rune_vm_internal::inference::ModelManager>(logger, inferenceRuntime);
+
         switch(backend) {
             case WasmBackend::Wasm3:
-                return std::make_shared<Wasm3Engine>(logger, inferenceRuntime);
+                return std::make_shared<Wasm3Engine>(logger, modelManager);
             default:
                 logger->log(
                     Severity::Error,

@@ -32,7 +32,7 @@ namespace rune_vm_internal::inference {
             std::shared_ptr<TfLiteInterpreter>&& tfInterpreter);
 
         bool run(
-            const rune_vm::DataView<rune_vm::DataView<const uint8_t>> inputs,
+            const rune_vm::DataView<const rune_vm::DataView<const uint8_t>> inputs,
             const rune_vm::DataView<rune_vm::DataView<uint8_t>> outputs) noexcept;
 
     private:
@@ -56,7 +56,7 @@ namespace rune_vm_internal::inference {
         // IRuntime
         bool run(
             const IModel::Ptr& model,
-            const rune_vm::DataView<rune_vm::DataView<const uint8_t>> inputs,
+            const rune_vm::DataView<const rune_vm::DataView<const uint8_t>> inputs,
             const rune_vm::DataView<rune_vm::DataView<uint8_t>> outputs) noexcept final;
         IModel::Ptr loadModel(
             const rune_vm::DataView<const uint8_t> model,
