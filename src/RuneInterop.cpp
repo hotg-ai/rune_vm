@@ -9,7 +9,7 @@
 
 namespace rune_vm_internal::rune_interop {
     template<>
-    constexpr ValueType fromInt<ValueType>(const TIntType valueType) {
+    ValueType fromInt<ValueType>(const TIntType valueType) {
         switch(valueType) {
             case 1:
                 return ValueType::Int32;
@@ -25,7 +25,7 @@ namespace rune_vm_internal::rune_interop {
     }
 
     template<>
-    constexpr OutputType fromInt<OutputType>(const TIntType outputType) {
+    OutputType fromInt<OutputType>(const TIntType outputType) {
         switch(outputType) {
             case 1:
                 return OutputType::Serial;
@@ -41,7 +41,7 @@ namespace rune_vm_internal::rune_interop {
     }
 
     template<>
-    constexpr Capability fromInt<Capability>(const TIntType capability) {
+    Capability fromInt<Capability>(const TIntType capability) {
         switch(capability) {
             case 1:
                 return Capability::Rand;

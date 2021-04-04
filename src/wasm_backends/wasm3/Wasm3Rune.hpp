@@ -11,6 +11,7 @@
 
 struct M3Module;
 struct M3Runtime;
+struct M3Function;
 
 namespace rune_vm_internal {
     class Wasm3Rune: public rune_vm::IRune {
@@ -36,6 +37,7 @@ namespace rune_vm_internal {
         std::shared_ptr<M3Module> m_module;
         std::shared_ptr<M3Runtime> m_runtime;
         host_functions::HostContext m_hostContext;
+        M3Function* m_callFunction;
     };
 }
 

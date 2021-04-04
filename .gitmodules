@@ -7,3 +7,6 @@
 [submodule "extern/mio"]
 	path = extern/mio
 	url = git@github.com:mandreyel/mio.git
+[submodule "extern/json"]
+	path = extern/json
+	url = git@github.com:nlohmann/json.git

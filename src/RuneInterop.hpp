@@ -25,6 +25,7 @@ namespace rune_vm_internal::rune_interop {
     }
 
     namespace rune_function_name {
+        constexpr const char g_call[] = "_call";
         constexpr const char g_manifest[] = "_manifest";
     }
 
@@ -41,7 +42,7 @@ namespace rune_vm_internal::rune_interop {
     using TIntType = uint32_t;
 
     template<typename T>
-    constexpr T fromInt(const TIntType);
+    T fromInt(const TIntType);
 
     // out
 

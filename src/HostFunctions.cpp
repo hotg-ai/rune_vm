@@ -38,7 +38,8 @@ namespace rune_vm_internal::host_functions {
         const inference::ModelManager::Ptr& modelManager)
         : m_log(logger, "HostContext")
         , m_capabilitiesManager(std::move(capabilitiesManager))
-        , m_modelManager(modelManager) {
+        , m_modelManager(modelManager)
+        , m_outputManager(logger) {
         CHECK_THROW(m_capabilitiesManager);
         CHECK_THROW(m_modelManager);
         m_log.log(Severity::Debug, "HostContext()");
@@ -280,7 +281,6 @@ namespace rune_vm_internal::host_functions {
         context->log().log(
             Severity::Debug,
             fmt::format("consumeOutput: outputId={} buffer size={}", outputId, buffer.m_size));
-
 
         if(!buffer.m_data || buffer.m_size == 0) {
             context->log().log(Severity::Error, "consumeOutput: input buffer invalid");

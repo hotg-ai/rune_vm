@@ -15,6 +15,9 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/extern/wasm3/source ${CMAKE_CURRENT
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/extern/fmt ${CMAKE_CURRENT_BINARY_DIR}/extern/fmt)
 ## mio
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/extern/mio ${CMAKE_CURRENT_BINARY_DIR}/extern/mio)
+## json
+set(JSON_BuildTests OFF CACHE INTERNAL "")
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/extern/json ${CMAKE_CURRENT_BINARY_DIR}/extern/json)
 
 # Add internal subdirectories
 set(RUNE_VM_INCLUDES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
@@ -64,6 +67,7 @@ target_link_libraries(
     ${RUNE_VM_TARGET_NAME}
     PRIVATE
     fmt::fmt
+    nlohmann_json::nlohmann_json
     ${RUNE_VM_WASM_BACKEND_TARGET}
     ${RUNE_VM_CAPABILITIES_TARGET}
     ${RUNE_VM_INFERENCE_BACKEND_TARGET})

@@ -207,7 +207,8 @@ namespace rune_vm_internal {
         , m_hostContext(
             logger,
             std::make_shared<CapabilitiesDelegatesManager>(logger, delegates),
-            modelManager) {
+            modelManager)
+        , m_callFunction(nullptr) {
         m_log.log(Severity::Debug, "Wasm3Rune()");
 
         // Link host functions
@@ -233,6 +234,16 @@ namespace rune_vm_internal {
             rune_interop::rune_function_name::g_manifest);
         CHECK_THROW(manifestFunction);
 
+        // Lookup call function
+        checkedCall(
+            m_log,
+            m_runtime,
+            m3_FindFunction,
+            &m_callFunction,
+            m_runtime.get(),
+            rune_interop::rune_function_name::g_call);
+        CHECK_THROW(m_callFunction);
+
         // Call manifest function
         checkedCall(
             m_log,
@@ -249,7 +260,22 @@ namespace rune_vm_internal {
     }
 
     IResult::Ptr Wasm3Rune::call() {
-#error impl
+        m_log.log(Severity::Debug, "call()");
+        checkedCall(
+            m_log,
+            m_runtime,
+            m3_CallArgv,
+            m_callFunction,
+            0,
+            nullptr);
+
+        // TODO: rethink output manager
+        const auto optOutputId = m_hostContext.outputManager().lastSavedId();
+        CHECK_THROW(optOutputId);
+        const auto optResult = m_hostContext.outputManager().consumeOutput(*optOutputId);
+        CHECK_THROW(optResult);
+
+        return *optResult;
     }
 
     // Internal

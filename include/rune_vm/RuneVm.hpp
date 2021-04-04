@@ -25,13 +25,15 @@ namespace rune_vm {
     struct IResult : VirtualInterface<IResult> {
         enum class Type: uint8_t {
             Uint32,
+            Int32,
+            Float,
             String,
             ByteBuffer,
             IResult
         };
 
         // NOTE: variant contains unowned references to internal data. Please don't use after IResult::Ptr release
-        using TVariant = std::variant<uint32_t, std::string_view, DataView<const uint8_t>, IResult::Ptr>;
+        using TVariant = std::variant<uint32_t, int32_t, float, std::string_view, DataView<const uint8_t>, IResult::Ptr>;
 
         [[nodiscard]] virtual TVariant getAt(const uint32_t idx) const = 0;
         [[nodiscard]] virtual Type typeAt(const uint32_t idx) const = 0;
