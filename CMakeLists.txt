@@ -7,6 +7,10 @@ set(CMAKE_CXX_FLAGS "-Werror=return-type")
 
 # Options
 option(RUNE_VM_INSTALL "To install or not to install. Might be useful if you add this library as submodule dep" ON)
+option(
+    RUNE_VM_TFLITE_EXTERNAL
+    "To link against external tflite binary. If set, you will have to provide RUNE_VM_INFERENCE_TFLITE_INCLUDE_DIRS and RUNE_VM_INFERENCE_TFLITE_LIBRARIES too"
+    OFF)
 
 # Add external dependencies
 ## wasm3-c
@@ -14,10 +18,17 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/extern/wasm3/source ${CMAKE_CURRENT
 ## fmt
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/extern/fmt ${CMAKE_CURRENT_BINARY_DIR}/extern/fmt)
 ## mio
+set(mio.installation OFF CACHE INTERNAL "")
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/extern/mio ${CMAKE_CURRENT_BINARY_DIR}/extern/mio)
 ## json
 set(JSON_BuildTests OFF CACHE INTERNAL "")
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/extern/json ${CMAKE_CURRENT_BINARY_DIR}/extern/json)
+## tensorflow-lite-c
+set(TFLITE_C_BUILD_SHARED_LIBS OFF CACHE INTERNAL "")
+set(BUILD_TESTING OFF CACHE INTERNAL "")
+add_subdirectory(
+    ${CMAKE_CURRENT_SOURCE_DIR}/extern/tensorflow/tensorflow/lite/c
+    ${CMAKE_CURRENT_BINARY_DIR}/extern/tensorflow/tensorflow/lite/c)
 
 # Add internal subdirectories
 set(RUNE_VM_INCLUDES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)

@@ -1,12 +1,17 @@
 cmake_minimum_required(VERSION 3.15)
 
 # Options
-# TODO: considering runtime interface it should be a list
-set(RUNE_VM_INFERENCE_TFLITE_INCLUDE_DIRS "" CACHE STRING "Tensorflow-lite-c include dirs")
-set(RUNE_VM_INFERENCE_TFLITE_LIBRARIES "" CACHE STRING "Tensorflow-lite-c libraries")
+message(STATUS "RUNE_VM_TFLITE_EXTERNAL=${RUNE_VM_TFLITE_EXTERNAL}")
+if(RUNE_VM_TFLITE_EXTERNAL)
+    set(RUNE_VM_INFERENCE_TFLITE_INCLUDE_DIRS "" CACHE STRING "Tensorflow-lite-c include dirs")
+    set(RUNE_VM_INFERENCE_TFLITE_LIBRARIES "" CACHE STRING "Tensorflow-lite-c libraries")
 
-message(STATUS "Tflite include dirs: ${RUNE_VM_INFERENCE_TFLITE_INCLUDE_DIRS}")
-message(STATUS "Tflite libraries: ${RUNE_VM_INFERENCE_TFLITE_LIBRARIES}")
+    message(STATUS "Tflite include dirs: ${RUNE_VM_INFERENCE_TFLITE_INCLUDE_DIRS}")
+    message(STATUS "Tflite libraries: ${RUNE_VM_INFERENCE_TFLITE_LIBRARIES}")
+else()
+    set(RUNE_VM_INFERENCE_TFLITE_INCLUDE_DIRS "")
+    set(RUNE_VM_INFERENCE_TFLITE_LIBRARIES tensorflowlite_c)
+endif()
 
 # Sources & Headers
 set(

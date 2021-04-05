@@ -21,6 +21,7 @@ set(
 add_library(${RUNE_VM_INFERENCE_BACKEND_TARGET} STATIC ${SOURCES} ${HEADERS})
 
 # Include actual backend
+# TODO: considering runtime interface it should be a list
 set(RUNE_VM_INFERENCE_IMPL_TARGET rune_vm_inference_backend_impl)
 if(${RUNE_VM_INFERENCE_BACKEND} STREQUAL tflite)
     message(STATUS "Tflite inference backend was chosen")

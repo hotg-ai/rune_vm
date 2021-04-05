@@ -10,3 +10,6 @@
 [submodule "extern/json"]
 	path = extern/json
 	url = git@github.com:nlohmann/json.git
+[submodule "extern/tensorflow"]
+	path = extern/tensorflow
+	url = git@github.com:tensorflow/tensorflow.git
