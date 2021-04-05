@@ -31,7 +31,9 @@ cmake ../ -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$PROJECT_DIR/install
 ```
 
 ### Build
-If BUILD_WORKERS_COUNT doesn't work on your platform, you may pass your count of cores or omit --parallel arg altogether.
+Notes: 
+1. Tensorflow compilation via console tries to print pages for some reason. My console app - iTerm2 - blocks it after couple of requests, so if yours doesn't you may want to try it;
+2. If BUILD_WORKERS_COUNT doesn't work on your platform, you may pass your count of cores or omit --parallel arg altogether;
 ```shell
 BUILD_WORKERS_COUNT=$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || getconf _NPROCESSORS_ONLN 2>/dev/null)
 cmake --build ./ --target rune_vm --parallel $BUILD_WORKERS_COUNT
