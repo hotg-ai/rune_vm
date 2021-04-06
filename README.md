@@ -21,6 +21,7 @@ git submodule update --init --recursive
 ### Configure via cmake
 Notable cmake options - for complete list use cmake gui app:
 - RUNE_VM_TFLITE_EXTERNAL - ON if you wish to use external tensorflow binary, e.g. installed via Pod. In that case you will have to provide RUNE_VM_INFERENCE_TFLITE_INCLUDE_DIRS and RUNE_VM_INFERENCE_TFLITE_LIBRARIES too. OFF if you want tensorflow to be build as part of the project. OFF by default;
+- RUNE_VM_BUILD_TESTS - ON if you wish to build rune vm tests. ON by default;
 - CMAKE_BUILD_TYPE - set it to either Debug or Release;
 - CMAKE_INSTALL_PREFIX - set to the location you wish the SDK to be installed to.
 
@@ -45,4 +46,7 @@ cmake --build ./ --target install --parallel $BUILD_WORKERS_COUNT
 ```
 
 ### Test
-*TBD*
+NOTE: RUNE_VM_BUILD_TESTS must be enabled during cmake configuration for tests to work.
+```shell
+ctest
+```

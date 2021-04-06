@@ -11,24 +11,29 @@ option(
     RUNE_VM_TFLITE_EXTERNAL
     "To link against external tflite binary. If set, you will have to provide RUNE_VM_INFERENCE_TFLITE_INCLUDE_DIRS and RUNE_VM_INFERENCE_TFLITE_LIBRARIES too"
     OFF)
+option(RUNE_VM_BUILD_TESTS "Build rune vm tests" ON)
 
 # Add external dependencies
 ## wasm3-c
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/extern/wasm3/source ${CMAKE_CURRENT_BINARY_DIR}/extern/wasm3_m3)
+add_subdirectory(
+    ${CMAKE_CURRENT_SOURCE_DIR}/extern/wasm3/source
+    ${CMAKE_CURRENT_BINARY_DIR}/extern/wasm3_m3
+    EXCLUDE_FROM_ALL)
 ## fmt
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/extern/fmt ${CMAKE_CURRENT_BINARY_DIR}/extern/fmt)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/extern/fmt ${CMAKE_CURRENT_BINARY_DIR}/extern/fmt EXCLUDE_FROM_ALL)
 ## mio
 set(mio.installation OFF CACHE INTERNAL "")
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/extern/mio ${CMAKE_CURRENT_BINARY_DIR}/extern/mio)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/extern/mio ${CMAKE_CURRENT_BINARY_DIR}/extern/mio EXCLUDE_FROM_ALL)
 ## json
 set(JSON_BuildTests OFF CACHE INTERNAL "")
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/extern/json ${CMAKE_CURRENT_BINARY_DIR}/extern/json)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/extern/json ${CMAKE_CURRENT_BINARY_DIR}/extern/json EXCLUDE_FROM_ALL)
 ## tensorflow-lite-c
 set(TFLITE_C_BUILD_SHARED_LIBS OFF CACHE INTERNAL "")
 set(BUILD_TESTING OFF CACHE INTERNAL "")
 add_subdirectory(
     ${CMAKE_CURRENT_SOURCE_DIR}/extern/tensorflow/tensorflow/lite/c
-    ${CMAKE_CURRENT_BINARY_DIR}/extern/tensorflow/tensorflow/lite/c)
+    ${CMAKE_CURRENT_BINARY_DIR}/extern/tensorflow/tensorflow/lite/c
+    EXCLUDE_FROM_ALL)
 
 # Add internal subdirectories
 set(RUNE_VM_INCLUDES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
@@ -82,6 +87,25 @@ target_link_libraries(
     ${RUNE_VM_WASM_BACKEND_TARGET}
     ${RUNE_VM_CAPABILITIES_TARGET}
     ${RUNE_VM_INFERENCE_BACKEND_TARGET})
+
+# Tests
+## gtest
+if(RUNE_VM_BUILD_TESTS)
+    message(STATUS "RUNE_VM tests are enabled")
+
+    # Include and enable ctest
+    include(CTest)
+    enable_testing()
+
+    # Add gtest
+    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+    set(BUILD_GMOCK OFF CACHE BOOL "")
+    set(INSTALL_GTEST OFF CACHE BOOL "")
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/extern/gtest)
+
+    # Add tests directory
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/tests)
+endif(RUNE_VM_BUILD_TESTS)
 
 # Installation rules
 if(RUNE_VM_INSTALL)

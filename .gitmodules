@@ -13,3 +13,6 @@
 [submodule "extern/tensorflow"]
 	path = extern/tensorflow
 	url = git@github.com:tensorflow/tensorflow.git
+[submodule "extern/gtest"]
+	path = extern/gtest
+	url = git@github.com:google/googletest.git
