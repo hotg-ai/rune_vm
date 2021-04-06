@@ -69,7 +69,7 @@ namespace rune_vm {
         // if optional is not set for either of args, default values are used
         [[nodiscard]] virtual IRuntime::Ptr createRuntime(
             const std::optional<uint32_t> optStackSizeBytes = std::nullopt,
-            const std::optional<uint32_t> optMemoryLimi = std::nullopt) = 0;
+            const std::optional<uint32_t> optMemoryLimit = std::nullopt) = 0;
     };
 
     [[nodiscard]] IEngine::Ptr createEngine(

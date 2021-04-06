@@ -16,7 +16,7 @@ namespace rune_vm_internal {
     void checkM3Error(
         const rune_vm::LoggingModule& log,
         const std::shared_ptr<M3Runtime>& runtime,
-        const M3Result& result) {
+        const M3Result result) {
         if(result != m3Err_none) {
             auto info = M3ErrorInfo();
 

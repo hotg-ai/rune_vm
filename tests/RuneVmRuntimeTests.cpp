@@ -5,7 +5,7 @@
 
 #include <gtest/gtest.h>
 #include <rune_vm/RuneVm.hpp>
+#include "TestLogger.hpp"
 
-TEST(VasyaTest, Negative) {
-    ASSERT_TRUE(true);
-}
+using namespace rune_vm;
+

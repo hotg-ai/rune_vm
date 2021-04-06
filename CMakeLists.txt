@@ -81,7 +81,7 @@ add_library(${RUNE_VM_TARGET_NAME} STATIC ${SOURCES} ${HEADERS})
 # Link dependencies
 target_link_libraries(
     ${RUNE_VM_TARGET_NAME}
-    PRIVATE
+    PUBLIC
     fmt::fmt
     nlohmann_json::nlohmann_json
     ${RUNE_VM_WASM_BACKEND_TARGET}

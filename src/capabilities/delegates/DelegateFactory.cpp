@@ -58,9 +58,11 @@ namespace {
 
     template<typename TDelegate>
     void registerDelegate(TMap& map) {
+        constexpr auto capabilities = TDelegate::supportedCapabilities();
+
         std::transform(
-            TDelegate::supportedCapabilities().begin(),
-            TDelegate::supportedCapabilities().end(),
+            capabilities.begin(),
+            capabilities.end(),
             std::inserter(map, map.begin()),
             [](const auto capability) {
                 return std::make_pair(

@@ -8,6 +8,7 @@
 #include <memory>
 #include <string_view>
 #include <string>
+#include <rune_vm/VirtualInterface.hpp>
 
 namespace rune_vm {
     enum class Severity: uint8_t {
@@ -18,10 +19,7 @@ namespace rune_vm {
     };
 
     // TODO: Add default loggers
-    struct ILogger {
-        using Ptr = std::shared_ptr<ILogger>;
-        using CPtr = std::shared_ptr<const ILogger>;
-
+    struct ILogger: VirtualInterface<ILogger> {
         virtual void log(
             const Severity severity,
             const std::string_view module,

@@ -295,4 +295,21 @@ namespace rune_vm_internal::host_functions {
 
         return 0;
     }
+
+    TResult debug(HostContext* context, const rune_vm::DataView<const char> message) noexcept {
+        if(!context) {
+            return rune_interop::RC_InputError;
+        }
+
+        if(!message.m_data || message.m_size == 0) {
+            context->log().log(Severity::Error, "host_functions::debug: input message invalid");
+            return rune_interop::RC_InputError;
+        }
+
+        context->log().log(
+            Severity::Debug,
+            fmt::format("host_functions::debug: message={}", std::string_view(message.m_data, message.m_size)));
+
+        return 0;
+    }
 }

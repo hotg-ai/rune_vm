@@ -10,6 +10,8 @@ namespace rune_vm {
     template<typename Interface>
     struct VirtualInterface {
         using Ptr = std::shared_ptr<Interface>;
-        ~VirtualInterface();
+        using CPtr = std::shared_ptr<const Interface>;
+
+        virtual ~VirtualInterface() = default;
     };
 }

@@ -10,9 +10,6 @@
 #include <Common.hpp>
 
 namespace rune_vm {
-    template<typename T>
-    VirtualInterface<T>::~VirtualInterface() = default;
-
     [[nodiscard]] IEngine::Ptr createEngine(
         const ILogger::CPtr& logger,
         const WasmBackend backend,
