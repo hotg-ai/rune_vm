@@ -48,5 +48,5 @@ cmake --build ./ --target install --parallel $BUILD_WORKERS_COUNT
 ### Test
 NOTE: RUNE_VM_BUILD_TESTS must be enabled during cmake configuration for tests to work.
 ```shell
-ctest
+./tests/rune_vm_tests
 ```

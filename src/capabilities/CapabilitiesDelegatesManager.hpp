@@ -21,13 +21,14 @@ namespace rune_vm_internal {
             const rune_vm::ILogger::CPtr& logger,
             const std::vector<rune_vm::capabilities::IDelegate::Ptr>& delegates);
 
+        // host function helpers
         [[nodiscard]] std::optional<rune_vm::capabilities::TId> createCapability(
             const rune_vm::capabilities::Capability capability);
         bool setCapabilityParam(
             const rune_vm::capabilities::TId capabilityId,
             const rune_vm::capabilities::TKey& key,
             const rune_vm::capabilities::Parameter& parameter) noexcept;
-        bool getInput(
+        [[nodiscard]] bool getInput(
             const rune_vm::DataView<uint8_t> buffer,
             const rune_vm::capabilities::TId capabilityId) noexcept;
 

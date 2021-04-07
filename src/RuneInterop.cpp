@@ -57,4 +57,22 @@ namespace rune_vm_internal::rune_interop {
 
         CHECK_THROW(false);
     }
+
+    template<>
+    TIntType toInt<Capability>(const Capability capability) {
+        switch(capability) {
+            case Capability::Rand:
+                return 1;
+            case Capability::Sound:
+                return 2;
+            case Capability::Accel:
+                return 3;
+            case Capability::Image:
+                return 4;
+            case Capability::Raw:
+                return 5;
+        }
+
+        CHECK_THROW(false);
+    }
 }

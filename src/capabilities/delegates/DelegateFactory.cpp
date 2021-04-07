@@ -43,7 +43,7 @@ namespace {
 
     template<typename ...TDelegates>
     constexpr auto flattenArrays() noexcept {
-        constexpr auto tuple = std::make_tuple(TDelegates::supportedCapabilities()...);
+        constexpr auto tuple = std::make_tuple(TDelegates::g_supportedCapabilities...);
         return concatCapabilities<0>(tuple);
     }
 
@@ -58,11 +58,9 @@ namespace {
 
     template<typename TDelegate>
     void registerDelegate(TMap& map) {
-        constexpr auto capabilities = TDelegate::supportedCapabilities();
-
         std::transform(
-            capabilities.begin(),
-            capabilities.end(),
+            TDelegate::g_supportedCapabilities.begin(),
+            TDelegate::g_supportedCapabilities.end(),
             std::inserter(map, map.begin()),
             [](const auto capability) {
                 return std::make_pair(

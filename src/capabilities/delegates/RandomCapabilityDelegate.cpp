@@ -13,7 +13,7 @@ namespace rune_vm_internal {
 
     RandomCapabilityDelegate::RandomCapabilityDelegate(const ILogger::CPtr& logger)
         : m_log(logger, "RandomCapabilityDelegate")
-        , m_supportedCapabilities(supportedCapabilities().begin(), supportedCapabilities().end()) {
+        , m_supportedCapabilities(g_supportedCapabilities.begin(), g_supportedCapabilities.end()) {
         m_log.log(Severity::Debug, "RandomCapabilityDelegate()");
     }
 
@@ -128,7 +128,7 @@ namespace rune_vm_internal {
         }
 
         const auto& range = iter->second.m_range;
-        if(range.second > range.first) {
+        if(range.second <= range.first) {
             m_log.log(
                 Severity::Error,
                 fmt::format(
@@ -144,6 +144,6 @@ namespace rune_vm_internal {
 
         std::memcpy(buffer.m_data, &randomFloat, sizeof(randomFloat));
 
-        return false;
+        return true;
     }
 }

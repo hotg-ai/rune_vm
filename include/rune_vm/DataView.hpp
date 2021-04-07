@@ -8,7 +8,7 @@
 #include <cstdint>
 
 namespace rune_vm {
-    template<typename T, typename TSize = uint64_t>
+    template<typename T, typename TSize = uint32_t>
     struct DataView {
         DataView(T* data, TSize size)
             : m_data(data)

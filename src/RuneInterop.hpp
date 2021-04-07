@@ -44,6 +44,9 @@ namespace rune_vm_internal::rune_interop {
     template<typename T>
     T fromInt(const TIntType);
 
+    template<typename T>
+    TIntType toInt(const T);
+
     // out
 
 }

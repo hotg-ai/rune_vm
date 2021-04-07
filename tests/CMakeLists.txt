@@ -16,6 +16,7 @@ set(
 set(
     HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/TestLogger.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Common.hpp
 )
 
 # Add executable
@@ -28,6 +29,9 @@ target_link_libraries(
     PRIVATE
     ${RUNE_VM_TARGET_NAME}
     gtest_main)
+
+# Pass test data directory as define
+target_compile_definitions(${RUNE_VM_TESTS_TARGET} PRIVATE TEST_DATA_DIRECTORY="${CMAKE_CURRENT_SOURCE_DIR}/test_data")
 
 # Discover google tests to add to ctest
 gtest_discover_tests(${RUNE_VM_TESTS_TARGET})

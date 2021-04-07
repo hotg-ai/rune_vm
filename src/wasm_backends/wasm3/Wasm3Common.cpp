@@ -21,10 +21,15 @@ namespace rune_vm_internal {
             auto info = M3ErrorInfo();
 
             m3_GetErrorInfo(runtime.get(), &info);
-            CHECK_THROW(info.file && info.message);
-            log.log(
-        rune_vm::Severity::Error,
-        fmt::format("M3 function has failed: file={} line={} msg={}", info.file, info.line, info.message));
+            if(info.file && info.message) {
+                log.log(
+                    rune_vm::Severity::Error,
+                    fmt::format("M3 function has failed: file={} line={} msg={}, result={}", info.file, info.line, info.message, result));
+            } else {
+                log.log(
+                    rune_vm::Severity::Error,
+                    fmt::format("M3 function has failed, m3_GetErrorInfo null: result={}", result));
+            }
             CHECK_THROW(false);
         }
     }

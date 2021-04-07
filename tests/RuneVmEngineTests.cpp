@@ -5,6 +5,7 @@
 
 #include <gtest/gtest.h>
 #include <rune_vm/RuneVm.hpp>
+#include "Common.hpp"
 #include "TestLogger.hpp"
 
 using namespace rune_vm;
@@ -21,7 +22,7 @@ TEST_P(RuneVmIEngineCorrectConstructorTest, CorrectConstruction) {
 INSTANTIATE_TEST_SUITE_P(
     CorrectArguments,
     RuneVmIEngineCorrectConstructorTest,
-    testing::Combine(testing::Values(WasmBackend::Wasm3), testing::Values(1, 2, 4, 8, 16, 32)));
+    testing::Combine(testing::ValuesIn(g_wasmBackends), testing::ValuesIn(g_threadCounts)));
 
 // Invalid construction
 struct RuneVmIEngineInvalidConstructorTest : public testing::TestWithParam<std::tuple<WasmBackend, TThreadCount>> {};
@@ -35,7 +36,7 @@ TEST_P(RuneVmIEngineInvalidConstructorTest, InvalidConstruction) {
 INSTANTIATE_TEST_SUITE_P(
     InvalidArguments,
     RuneVmIEngineInvalidConstructorTest,
-    testing::Combine(testing::Values(WasmBackend::Wasm3), testing::Values(0)));
+    testing::Combine(testing::ValuesIn(g_wasmBackends), testing::Values(0)));
 
 TEST(RuneVmIEngineInvalidConstructorTest, NullLogger) {
     ASSERT_THROW(createEngine(nullptr, WasmBackend::Wasm3, 2), std::runtime_error);
@@ -56,8 +57,8 @@ INSTANTIATE_TEST_SUITE_P(
     CorrectArguments,
     RuneVmIEngineCreateRuntimeCorrectTest,
     testing::Combine(
-        testing::Values(WasmBackend::Wasm3),
-        testing::Values(1, 2, 4, 8, 16, 32),
+        testing::ValuesIn(g_wasmBackends),
+        testing::ValuesIn(g_threadCounts),
         testing::Values(std::nullopt, 1, 1 << 5, 1 << 10, 1 << 15, 1 << 20, uint32_t(-1)),
         testing::Values(std::nullopt, 1, 1 << 5, 1 << 10, 1 << 15, 1 << 20, uint32_t(-1))));
 

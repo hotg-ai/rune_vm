@@ -47,7 +47,7 @@ namespace rune_vm_internal {
     CapabilitiesDelegatesManager::CapabilitiesDelegatesManager(
         const ILogger::CPtr& logger,
         const std::vector<capabilities::IDelegate::Ptr>& delegates)
-        : m_log(logger, "CapabilitiesDelegatesMaanger")
+        : m_log(logger, "CapabilitiesDelegatesManager")
         , m_delegates([this, &delegates] {
                 auto map = std::unordered_map<capabilities::Capability, capabilities::IDelegate::Ptr>();
 

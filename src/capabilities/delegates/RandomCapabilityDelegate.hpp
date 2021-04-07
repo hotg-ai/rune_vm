@@ -13,9 +13,7 @@
 namespace rune_vm_internal {
     class RandomCapabilityDelegate : public rune_vm::capabilities::IDelegate {
     public:
-        static constexpr auto supportedCapabilities() noexcept {
-            return std::array{rune_vm::capabilities::Capability::Rand};
-        }
+        static constexpr auto g_supportedCapabilities = std::array{rune_vm::capabilities::Capability::Rand};
 
         RandomCapabilityDelegate(const rune_vm::ILogger::CPtr& logger);
 

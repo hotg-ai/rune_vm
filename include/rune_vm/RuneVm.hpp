@@ -52,6 +52,8 @@ namespace rune_vm {
         //
         // delegates - pass delegates, each providing some subset of capabilities.
         // Subsets should not intersect, if that happens, delegate for capability with multiple delegates is chosen randomly
+        //
+        // loadRune will not copy DataView with wasm, it's on you to keep memory allocated
         [[nodiscard]] virtual IRune::Ptr loadRune(
             const std::vector<capabilities::IDelegate::Ptr>& delegates,
             const DataView<const uint8_t> data) = 0;

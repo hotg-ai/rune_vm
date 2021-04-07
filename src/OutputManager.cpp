@@ -126,6 +126,12 @@ namespace rune_vm_internal {
 
         // atm we only work with Serial and it's guaranteed to be json
         try {
+            m_log.log(
+                Severity::Debug,
+                fmt::format(
+                    "saveOutput: output id={} output={}",
+                    outputId,
+                    std::string_view(reinterpret_cast<const char*>(buffer.m_data), buffer.m_size)));
             const auto json = nlohmann::json::parse(buffer);
             auto result = parse(m_log, json);
 
@@ -151,11 +157,13 @@ namespace rune_vm_internal {
             return std::nullopt;
         }
 
+        const auto output = std::move(iter->second);
+
         m_results.erase(iter);
 
         if(m_lastSavedId && outputId == *m_lastSavedId)
             m_lastSavedId.reset();
 
-        return iter->second;
+        return output;
     }
 }

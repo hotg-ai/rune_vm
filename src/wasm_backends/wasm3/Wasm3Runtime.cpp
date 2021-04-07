@@ -21,13 +21,15 @@ namespace {
     using namespace rune_vm;
     using namespace rune_vm_internal;
 
+    template<typename... TDeleter>
     auto createRune(
         const LoggingModule& log,
         M3Environment& environment,
         std::shared_ptr<M3Runtime> runtime,
         const inference::ModelManager::Ptr& modelManager,
         const std::vector<rune_vm::capabilities::IDelegate::Ptr>& delegates,
-        const DataView<const uint8_t> data) {
+        const DataView<const uint8_t> data,
+        TDeleter&&... deleter) {
         if(delegates.empty())
             log.log(Severity::Warning, "No delegates passed - that's very likely an error");
 
@@ -46,7 +48,7 @@ namespace {
             rawModule,
             [loaded](IM3Module module) {
                 // runtime cleans loaded modules
-                if (!loaded) {
+                if (!*loaded) {
                     m3_FreeModule(module);
                 }
             });
@@ -62,12 +64,14 @@ namespace {
         *loaded = true;
 
         // Create delegates manager
-        return std::make_shared<rune_vm_internal::Wasm3Rune>(
-            log.logger(),
-            std::move(module),
-            std::move(runtime),
-            delegates,
-            modelManager);
+        return std::shared_ptr<rune_vm_internal::Wasm3Rune>(
+            new rune_vm_internal::Wasm3Rune(
+                log.logger(),
+                std::move(module),
+                std::move(runtime),
+                delegates,
+                modelManager),
+            std::forward<TDeleter>(deleter)...);
     }
 
     auto createRuntime(
@@ -121,11 +125,11 @@ namespace rune_vm_internal {
         const std::vector<rune_vm::capabilities::IDelegate::Ptr>& delegates,
         const std::string_view fileName) {
         CHECK_THROW(!fileName.empty());
-        m_log.log(Severity::Info, fmt::format("loadRune from fileName=", fileName));
+        m_log.log(Severity::Info, fmt::format("loadRune from fileName={}", fileName));
 
         // load file
         auto errorCode = std::error_code();
-        const auto mmapedFile = mio::make_mmap_source(fileName, errorCode);
+        auto mmapedFile = std::make_shared<mio::mmap_source>(mio::make_mmap_source(fileName, errorCode));
         if(errorCode) {
             m_log.log(
                 Severity::Error,
@@ -134,9 +138,19 @@ namespace rune_vm_internal {
         }
 
         const auto mmapDataView = DataView<const uint8_t>(
-            reinterpret_cast<const uint8_t*>(mmapedFile.data()),
-            mmapedFile.size());
-        return createRune(m_log, *m_environment, m_runtime, m_modelManager, delegates, mmapDataView);
+            reinterpret_cast<const uint8_t*>(mmapedFile->data()),
+            mmapedFile->size());
+        return createRune(
+            m_log,
+            *m_environment,
+            m_runtime,
+            m_modelManager,
+            delegates,
+            mmapDataView,
+            // wasm module uses memory it is created from
+            [mmapedFile = std::move(mmapedFile)](auto* ptr) {
+                delete ptr;
+            });
     }
 
     std::vector<rune_vm::capabilities::Capability> Wasm3Runtime::getCapabilitiesWithDefaultDelegates() const noexcept {
