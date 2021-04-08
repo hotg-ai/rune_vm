@@ -12,40 +12,18 @@
 
 using namespace rune_vm;
 
-struct Delegate : public capabilities::IDelegate {
-    Delegate(const float input)
-        : m_input(input) {}
+struct RandDelegate : public CommonTestDelegate<capabilities::Capability::Rand> {
+    RandDelegate(const float input)
+        : CommonTestDelegate([input] {
+            auto data = std::vector<uint8_t>();
 
-private:
-    // rune_vm::capabilities::IDelegate
-    [[nodiscard]] std::unordered_set<rune_vm::capabilities::Capability>
-        getSupportedCapabilities() const noexcept final {
-        return {capabilities::Capability::Rand};
-    }
+            data.resize(sizeof(input));
+            std::memcpy(data.data(), &input, sizeof(input));
 
-    [[nodiscard]] bool requestCapability(
-        const rune_vm::capabilities::Capability capability,
-        const rune_vm::capabilities::TId newCapabilityId) noexcept final {
-        return true;
-    }
-
-    [[nodiscard]] bool requestCapabilityParamChange(
-        const rune_vm::capabilities::TId capabilityId,
-        const rune_vm::capabilities::TKey& key,
-        const rune_vm::capabilities::Parameter& parameter) noexcept final {
-        return true;
-    }
-
-    [[nodiscard]] bool requestRuneInputFromCapability(
-        const rune_vm::DataView<uint8_t> buffer,
-        const rune_vm::capabilities::TId capabilityId) noexcept final {
-        std::memcpy(buffer.m_data, &m_input, sizeof(m_input));
-        return true;
-    }
-
-    //
-    float m_input;
+            return data;
+        }()) {}
 };
+
 struct SineRuneTest
     : public testing::TestWithParam<
         std::tuple<WasmBackend, TThreadCount, std::optional<uint32_t>, std::optional<uint32_t>>> {
@@ -73,11 +51,19 @@ struct SineRuneTest
         ASSERT_EQ(elementResult->typeAt(0), rune_vm::IResult::Type::Float);
         const auto valueVariant = elementResult->getAt(0);
         ASSERT_TRUE(std::holds_alternative<float>(valueVariant));
-        const auto& value = std::get<float>(valueVariant);
-        ASSERT_LE(value, 1.f);
-        ASSERT_GE(value, -1.f);
 
-        output = value;
+        output = std::get<float>(valueVariant);
+        ASSERT_LE(output, 1.f);
+        ASSERT_GE(output, -1.f);
+    }
+
+    void testCustomWithInput(const float input, const float expected, const float acceptableDiff) {
+        const auto delegate = std::make_shared<RandDelegate>(input);
+        auto output = 100.f;
+
+        loadAndRun(output, {delegate});
+        // sine rune is inexact
+        ASSERT_NEAR(output, expected, acceptableDiff);
     }
 
     // setup
@@ -98,22 +84,15 @@ TEST_P(SineRuneTest, DefaultRandDelegate) {
 
 TEST_P(SineRuneTest, CustomRandDelegate) {
     const auto input = m_distrib(m_engine);
-    const auto delegate = std::make_shared<Delegate>(input);
-    auto output = 100.f;
 
-    loadAndRun(output, {delegate});
     // sine rune is inexact
-    ASSERT_NEAR(output, std::sin(input), 0.1f);
+    testCustomWithInput(input, std::sin(input), 0.1f);
 }
 
 TEST_P(SineRuneTest, CustomRandDelegateKnownValue) {
-    const auto input = 0.8f;
-    const auto delegate = std::make_shared<Delegate>(input);
-    auto output = 100.f;
+    constexpr auto input = 0.8f;
 
-    loadAndRun(output, {delegate});
-    // sine rune is inexact
-    ASSERT_NEAR(output, 6.972786e-1, 0.0001f);
+    testCustomWithInput(input, 6.972786e-1, 0.0001f);
 }
 
 INSTANTIATE_TEST_SUITE_P(

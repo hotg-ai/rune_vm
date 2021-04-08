@@ -127,15 +127,8 @@ namespace rune_vm_internal {
             return false;
         }
 
-        const auto [iterKey, foundKey] = find(iterId->second.m_parameters, key);
-        if(!foundKey) {
-            m_log.log(Severity::Error, fmt::format("Failed to find parameter for id={} and key={}", capabilityId, key));
-            return false;
-        }
-
-        if(!iterId->second.m_availability)
-            m_log.log(Severity::Warning, "Setting param for capability which is not available currently");
-
+        // if the key is there already, value will not be updated
+        auto [iter, inserted] = iterId->second.m_parameters.emplace(key, parameter);
         const auto requestResult = iterId->second.owner()->requestCapabilityParamChange(capabilityId, key, parameter);
         if(!requestResult) {
             m_log.log(
@@ -145,11 +138,27 @@ namespace rune_vm_internal {
                     capabilityId,
                     key,
                     parameter));
+
+            // if request is denied, erase inserted param
+            // in case it was not inserted (i.e. key was there already) state did not change so no need for rollback
+            if(inserted)
+                iterId->second.m_parameters.erase(iter);
+
             return false;
         }
 
+        if(inserted) {
+            m_log.log(
+                Severity::Info,
+                fmt::format("Failed to find parameter for id={} and key={} -> create it", capabilityId, key));
+        }
+
+        iter->second = std::move(parameter);
+
+        if(!iterId->second.m_availability)
+            m_log.log(Severity::Warning, "Setting param for capability which is not available currently");
+
         static_assert(std::is_nothrow_copy_assignable_v<std::decay_t<decltype(parameter)>>);
-        iterKey->second = parameter;
         m_log.log(
             Severity::Info,
             fmt::format("Capability parameter={} for id={} and key={} is set", parameter, capabilityId, key));

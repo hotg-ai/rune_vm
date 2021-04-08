@@ -5,7 +5,8 @@ include(GoogleTest)
 # Sources & Headers
 set(
     TESTS
-    ${CMAKE_CURRENT_SOURCE_DIR}/RuneTests.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/GestureRuneTests.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/SineRuneTests.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/RuneVmEngineTests.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/RuneVmRuntimeTests.cpp
 )
@@ -29,6 +30,12 @@ target_link_libraries(
     PRIVATE
     ${RUNE_VM_TARGET_NAME}
     gtest_main)
+
+# Include non-cmake dependencies paths
+target_include_directories(
+    ${RUNE_VM_TESTS_TARGET}
+    PRIVATE
+    ${RUNE_VM_CSV_PARSER_INCLUDE_PATH})
 
 # Pass test data directory as define
 target_compile_definitions(${RUNE_VM_TESTS_TARGET} PRIVATE TEST_DATA_DIRECTORY="${CMAKE_CURRENT_SOURCE_DIR}/test_data")

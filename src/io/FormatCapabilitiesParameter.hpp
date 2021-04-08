@@ -8,16 +8,7 @@
 #include <rune_vm/Capabilities.hpp>
 
 template <>
-struct fmt::formatter<rune_vm::capabilities::Parameter> {
-    constexpr auto parse(format_parse_context& ctx) {
-        auto it = ctx.begin() + 1;
-
-        if (it != ctx.end() && *it != '}')
-            throw format_error("invalid format");
-
-        return ++it;
-    }
-
+struct fmt::formatter<rune_vm::capabilities::Parameter> : fmt::formatter<std::string> {
     template <typename FormatContext>
     auto format(const rune_vm::capabilities::Parameter& param, FormatContext& ctx) {
         return std::visit(

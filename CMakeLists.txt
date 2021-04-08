@@ -97,6 +97,9 @@ if(RUNE_VM_BUILD_TESTS)
     include(CTest)
     enable_testing()
 
+    # "Add" csv parser
+    set(RUNE_VM_CSV_PARSER_INCLUDE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/extern/fast-cpp-csv-parser)
+
     # Add gtest
     set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
     set(BUILD_GMOCK OFF CACHE BOOL "")
