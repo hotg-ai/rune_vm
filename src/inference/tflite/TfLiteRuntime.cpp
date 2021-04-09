@@ -3,7 +3,16 @@
 // Copyright (c) HAMMER OF THE GODS INC. - hotg.ai
 //
 
-#include <tensorflow/lite/c/c_api.h>
+#if defined(__APPLE__)
+    #include <TargetConditionals.h>
+#endif
+
+#if defined(__APPLE__) && TARGET_OS_IOS
+    #include <c_api.h>
+#else
+    #include <tensorflow/lite/c/c_api.h>
+#endif
+
 #include <fmt/format.h>
 #include <Common.hpp>
 #include <inference/tflite/TfLiteRuntime.hpp>

@@ -28,12 +28,14 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/extern/mio ${CMAKE_CURRENT_BINARY_D
 set(JSON_BuildTests OFF CACHE INTERNAL "")
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/extern/json ${CMAKE_CURRENT_BINARY_DIR}/extern/json EXCLUDE_FROM_ALL)
 ## tensorflow-lite-c
-set(TFLITE_C_BUILD_SHARED_LIBS OFF CACHE INTERNAL "")
-set(BUILD_TESTING OFF CACHE INTERNAL "")
-add_subdirectory(
-    ${CMAKE_CURRENT_SOURCE_DIR}/extern/tensorflow/tensorflow/lite/c
-    ${CMAKE_CURRENT_BINARY_DIR}/extern/tensorflow/tensorflow/lite/c
-    EXCLUDE_FROM_ALL)
+if(NOT RUNE_VM_TFLITE_EXTERNAL)
+    set(TFLITE_C_BUILD_SHARED_LIBS OFF CACHE INTERNAL "")
+    set(BUILD_TESTING OFF CACHE INTERNAL "")
+    add_subdirectory(
+        ${CMAKE_CURRENT_SOURCE_DIR}/extern/tensorflow/tensorflow/lite/c
+        ${CMAKE_CURRENT_BINARY_DIR}/extern/tensorflow/tensorflow/lite/c
+        EXCLUDE_FROM_ALL)
+endif(NOT RUNE_VM_TFLITE_EXTERNAL)
 
 # Add internal subdirectories
 set(RUNE_VM_INCLUDES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
