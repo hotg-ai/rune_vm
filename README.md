@@ -106,12 +106,12 @@ Notes:
 2. If BUILD_WORKERS_COUNT doesn't work on your platform, you may pass your count of cores or omit --parallel arg altogether;
 ```shell
 BUILD_WORKERS_COUNT=$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || getconf _NPROCESSORS_ONLN 2>/dev/null)
-cmake --build ./ --target rune_vm --parallel $BUILD_WORKERS_COUNT
+cmake --build ./ --target rune_vm --config Release --parallel $BUILD_WORKERS_COUNT
 ```
 
 ### Install
 ```shell
-cmake --build ./ --target install --parallel $BUILD_WORKERS_COUNT
+cmake --build ./ --target install --config Release --parallel $BUILD_WORKERS_COUNT
 ```
 
 ### Test
