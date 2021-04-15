@@ -29,6 +29,7 @@ namespace rune_vm_internal {
         [[nodiscard]] TVariant getAt(const uint32_t idx) const final;
         [[nodiscard]] Type typeAt(const uint32_t idx) const final;
         [[nodiscard]] uint32_t count() const noexcept final;
+        [[nodiscard]] std::string asJson() const noexcept final;
 
         // data
         std::vector<TInternalVariant> m_data;

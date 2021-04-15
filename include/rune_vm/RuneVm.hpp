@@ -38,6 +38,8 @@ namespace rune_vm {
         [[nodiscard]] virtual TVariant getAt(const uint32_t idx) const = 0;
         [[nodiscard]] virtual Type typeAt(const uint32_t idx) const = 0;
         [[nodiscard]] virtual uint32_t count() const noexcept = 0;
+
+        [[nodiscard]] virtual std::string asJson() const noexcept = 0;
     };
 
     struct IRune : VirtualInterface<IRune> {

@@ -4,8 +4,58 @@
 //
 
 #include <type_traits>
+#include <nlohmann/json.hpp>
 #include <Common.hpp>
 #include <Result.hpp>
+
+namespace {
+    using namespace rune_vm;
+    using namespace rune_vm_internal;
+
+    nlohmann::json parse(const IResult& result) {
+        auto json = nlohmann::json::array();
+
+        json.get_ptr<nlohmann::json::array_t*>()->reserve(result.count());
+
+        for(auto idx = 0ul; idx < result.count(); ++idx) {
+            auto element = result.getAt(idx);
+
+            switch(result.typeAt(idx)) {
+                case rune_vm::IResult::Type::IResult:
+                    json.push_back(parse(*std::get<IResult::Ptr>(element)));
+                    break;
+                case rune_vm::IResult::Type::Uint32:
+                    json.push_back(std::get<uint32_t>(element));
+                    break;
+                case rune_vm::IResult::Type::Int32:
+                    json.push_back(std::get<int32_t>(element));
+                    break;
+                case rune_vm::IResult::Type::Float:
+                    json.push_back(std::get<float>(element));
+                    break;
+                case rune_vm::IResult::Type::String:
+                    json.push_back(std::get<std::string_view>(element));
+                    break;
+                case rune_vm::IResult::Type::ByteBuffer: {
+                    const auto data = std::get<DataView<const uint8_t>>(element);
+                    auto subJson = nlohmann::json::array();
+
+                    subJson.get_ptr<nlohmann::json::array_t*>()->reserve(data.m_size);
+
+                    for(auto idx = 0ul; idx < data.m_size; ++idx)
+                        subJson[idx] = data.m_data[idx];
+
+                    json.push_back(std::move(subJson));
+                    break;
+                }
+                default:
+                    CHECK_THROW(false);
+            }
+        }
+
+        return json;
+    }
+}
 
 namespace rune_vm_internal {
     using namespace rune_vm;
@@ -95,5 +145,13 @@ namespace rune_vm_internal {
 
     uint32_t Result::count() const noexcept {
         return m_data.size();
+    }
+
+    [[nodiscard]] std::string Result::asJson() const noexcept {
+        try {
+            return parse(*this).dump();
+        } catch(const std::exception& e) {
+            return "";
+        }
     }
 }

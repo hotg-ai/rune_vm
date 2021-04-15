@@ -37,7 +37,7 @@ namespace rune_vm_internal {
         if(m_supportedCapabilities.count(capability) == 0) {
             m_log.log(
                 Severity::Error,
-                fmt::format("Requesting capability which is not supported", capability));
+                fmt::format("Requesting capability which is not supported={}", capability));
             return false;
         }
 
