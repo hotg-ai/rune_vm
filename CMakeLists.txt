@@ -38,6 +38,7 @@ if(NOT RUNE_VM_TFLITE_EXTERNAL)
 endif(NOT RUNE_VM_TFLITE_EXTERNAL)
 
 # Add internal subdirectories
+set(RUNE_VM_STATIC_LIBRARIES "" CACHE INTERNAL "")
 set(RUNE_VM_INCLUDES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 set(RUNE_VM_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 # # io (formatting)
@@ -79,6 +80,7 @@ set(
 # Add library
 set(RUNE_VM_TARGET_NAME ${PROJECT_NAME})
 add_library(${RUNE_VM_TARGET_NAME} STATIC ${SOURCES} ${HEADERS})
+set(RUNE_VM_STATIC_LIBRARIES ${RUNE_VM_STATIC_LIBRARIES} ${RUNE_VM_TARGET_NAME} CACHE INTERNAL "")
 
 # Link dependencies
 target_link_libraries(
@@ -114,6 +116,7 @@ endif(RUNE_VM_BUILD_TESTS)
 
 # Installation rules
 if(RUNE_VM_INSTALL)
-    install(TARGETS ${RUNE_VM_TARGET_NAME} DESTINATION lib)
+    message(STATUS "statics: ${RUNE_VM_STATIC_LIBRARIES}")
+    install(TARGETS ${RUNE_VM_STATIC_LIBRARIES} m3 fmt DESTINATION lib)
 	install(DIRECTORY ${RUNE_VM_INCLUDES_DIR}/rune_vm DESTINATION include)
 endif(RUNE_VM_INSTALL)

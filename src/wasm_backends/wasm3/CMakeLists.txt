@@ -17,6 +17,7 @@ set(
 )
 
 add_library(${RUNE_VM_WASM_BACKEND_IMPL_TARGET} STATIC ${SOURCES} ${HEADERS})
+set(RUNE_VM_STATIC_LIBRARIES ${RUNE_VM_STATIC_LIBRARIES} ${RUNE_VM_WASM_BACKEND_IMPL_TARGET} CACHE INTERNAL "")
 
 # Link public dependencies
 target_link_libraries(

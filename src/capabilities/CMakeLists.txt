@@ -15,6 +15,7 @@ set(
 )
 
 add_library(${RUNE_VM_CAPABILITIES_TARGET} STATIC ${SOURCES} ${HEADERS})
+set(RUNE_VM_STATIC_LIBRARIES ${RUNE_VM_STATIC_LIBRARIES} ${RUNE_VM_CAPABILITIES_TARGET} CACHE INTERNAL "")
 
 # Link private dependencies
 target_link_libraries(

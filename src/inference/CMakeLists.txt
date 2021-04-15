@@ -19,6 +19,7 @@ set(
 
 # Add target
 add_library(${RUNE_VM_INFERENCE_BACKEND_TARGET} STATIC ${SOURCES} ${HEADERS})
+set(RUNE_VM_STATIC_LIBRARIES ${RUNE_VM_STATIC_LIBRARIES} ${RUNE_VM_INFERENCE_BACKEND_TARGET} CACHE INTERNAL "")
 
 # Include actual backend
 # TODO: considering runtime interface it should be a list
