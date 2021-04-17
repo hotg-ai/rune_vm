@@ -76,6 +76,7 @@ namespace rune_vm_internal {
     }
 
     // TODO: pass output type allocation request to the client
+    // TODO: once its done, remove lastSavedId
     std::optional<TOutputId> OutputManager::requestOutput(const OutputType outputType) noexcept {
         if(outputType != OutputType::Serial) {
             m_log.log(
@@ -160,10 +161,7 @@ namespace rune_vm_internal {
 
         const auto output = std::move(iter->second);
 
-        m_results.erase(iter);
-
-        if(m_lastSavedId && outputId == *m_lastSavedId)
-            m_lastSavedId.reset();
+        iter->second.reset();
 
         return output;
     }
