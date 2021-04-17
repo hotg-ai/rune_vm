@@ -18,6 +18,21 @@ namespace rune_vm {
         Error
     };
 
+    constexpr auto severityToString(const Severity severity) {
+        switch(severity) {
+            case Severity::Debug:
+                return "Debug";
+            case Severity::Info:
+                return "Info";
+            case Severity::Warning:
+                return "Warning";
+            case Severity::Error:
+                return "Error";
+            default:
+                return "Unknown";
+        }
+    }
+
     // TODO: Add default loggers
     struct ILogger: VirtualInterface<ILogger> {
         virtual void log(
