@@ -48,10 +48,10 @@ namespace {
     }
 
     constexpr auto g_allSupportedDefaultCapabilities = flattenArrays<
-            // list of default delegates
-            RandomCapabilityDelegate
-            //
-            >();
+        // list of default delegates
+        RandomCapabilityDelegate
+        //
+        >();
 
     using TDelegateFactory = std::function<rune_vm::capabilities::IDelegate::Ptr(const rune_vm::ILogger::CPtr&)>;
     using TMap = std::unordered_map<rune_vm::capabilities::Capability, TDelegateFactory>;

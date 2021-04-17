@@ -97,7 +97,7 @@ namespace rune_vm_internal {
 
         const auto [capabilityDataIter, inserted] = m_capabilityData.insert_or_assign(
             allocatedCapabilityId,
-            CapabilityData(delegate));
+            CapabilityData(delegate, capability));
         if(!inserted) {
             m_log.log(
                 Severity::Warning,
@@ -246,14 +246,7 @@ namespace rune_vm_internal {
         return iterKey->second;
     }
 
-    //
-    CapabilitiesDelegatesManager::CapabilityData::CapabilityData(capabilities::IDelegate::Ptr owner)
-        : m_owner(std::move(owner))
-        , m_availability(true) {
-        CHECK_THROW(m_owner);
-    }
-
-    capabilities::IDelegate::Ptr CapabilitiesDelegatesManager::CapabilityData::owner() const noexcept {
-        return m_owner;
+    capabilities::IContext::TCapabilityIdToDataMap CapabilitiesDelegatesManager::getCapabilityIdToDataMap() const {
+        return m_capabilityData;
     }
 }

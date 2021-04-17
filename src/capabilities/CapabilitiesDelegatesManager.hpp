@@ -43,24 +43,12 @@ namespace rune_vm_internal {
         [[nodiscard]] std::optional<rune_vm::capabilities::Parameter> getParamForCapabilityForKey(
             const rune_vm::capabilities::TId capabilityId,
             const rune_vm::capabilities::TKey& key) const noexcept final;
-
-        // Internal data structs
-        struct CapabilityData {
-            CapabilityData(rune_vm::capabilities::IDelegate::Ptr owner);
-
-            TKeyToParameterMap m_parameters;
-            bool m_availability;
-
-            rune_vm::capabilities::IDelegate::Ptr owner() const noexcept;
-
-        private:
-            rune_vm::capabilities::IDelegate::Ptr m_owner;
-        };
+        [[nodiscard]] TCapabilityIdToDataMap getCapabilityIdToDataMap() const final;
 
         // data
         rune_vm::LoggingModule m_log;
         std::unordered_map<rune_vm::capabilities::Capability, rune_vm::capabilities::IDelegate::Ptr> m_delegates;
-        std::unordered_map<rune_vm::capabilities::TId, CapabilityData> m_capabilityData;
+        TCapabilityIdToDataMap m_capabilityData;
         rune_vm::capabilities::TId m_idCounter;
     };
 

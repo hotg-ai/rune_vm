@@ -38,21 +38,6 @@ namespace rune_vm::capabilities {
         Data m_data;
     };
 
-    struct IContext : VirtualInterface<IContext> {
-        using TKeyToParameterMap = std::unordered_map<TKey, Parameter>;
-
-        // This method is how user can retract approve for requested capability
-        // return false if capabilityId was not stored
-        virtual bool setCapabilityAvailability(const TId capabilityId, const bool available) noexcept = 0;
-
-        // Calling this method forces copy of internal parameters map. No need to do that frequently
-        [[nodiscard]] virtual std::optional<TKeyToParameterMap> getParamsForCapability(
-            const TId capabilityId) const noexcept = 0;
-        [[nodiscard]] virtual std::optional<Parameter> getParamForCapabilityForKey(
-            const TId capabilityId,
-            const TKey& key) const noexcept = 0;
-    };
-
     struct IDelegate : VirtualInterface<IDelegate> {
         // list of capabilities that are covered by this delegate
         // you may pass multiple delegates on the rune creation
@@ -75,5 +60,37 @@ namespace rune_vm::capabilities {
         [[nodiscard]] virtual bool requestRuneInputFromCapability(
             const rune_vm::DataView<uint8_t> buffer,
             const TId capabilityId) noexcept = 0;
+    };
+
+    struct IContext : VirtualInterface<IContext> {
+        using TKeyToParameterMap = std::unordered_map<TKey, Parameter>;
+
+        struct CapabilityData {
+            CapabilityData(IDelegate::Ptr owner, const rune_vm::capabilities::Capability capability);
+
+            rune_vm::capabilities::Capability m_capability;
+            TKeyToParameterMap m_parameters;
+            bool m_availability;
+
+            IDelegate::Ptr owner() const noexcept;
+
+        private:
+            IDelegate::Ptr m_owner;
+        };
+
+        using TCapabilityIdToDataMap = std::unordered_map<TId, CapabilityData>;
+
+        // This method is how user can retract approve for requested capability
+        // return false if capabilityId was not stored
+        virtual bool setCapabilityAvailability(const TId capabilityId, const bool available) noexcept = 0;
+
+        // Calling this method forces copy of internal parameters map. No need to do that frequently
+        [[nodiscard]] virtual std::optional<TKeyToParameterMap> getParamsForCapability(
+            const TId capabilityId) const noexcept = 0;
+        [[nodiscard]] virtual std::optional<Parameter> getParamForCapabilityForKey(
+            const TId capabilityId,
+            const TKey& key) const noexcept = 0;
+        // This method copies internal data - don't do that frequently
+        [[nodiscard]] virtual TCapabilityIdToDataMap getCapabilityIdToDataMap() const = 0;
     };
 }

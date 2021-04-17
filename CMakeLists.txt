@@ -59,6 +59,7 @@ set(
     SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/RuneVm.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Log.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Capabilities.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/HostFunctions.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/RuneInterop.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Result.cpp
