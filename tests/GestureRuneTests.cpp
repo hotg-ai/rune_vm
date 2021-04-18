@@ -7,6 +7,7 @@
 #include <random>
 #include <gtest/gtest.h>
 #include <csv.h>
+#include <fmt/format.h>
 #include <rune_vm/RuneVm.hpp>
 #include "Common.hpp"
 #include "TestLogger.hpp"
@@ -37,7 +38,7 @@ struct AccelDelegate : public CommonTestDelegate<capabilities::Capability::Accel
 
 struct GestureRuneTest
     : public testing::TestWithParam<
-        std::tuple<WasmBackend, TThreadCount, std::pair<std::string, std::string>, std::optional<uint32_t>, std::optional<uint32_t>>> {
+        std::tuple<WasmBackend, TThreadCount, std::pair<std::string, std::string>, std::optional<uint32_t>, std::optional<uint32_t>, size_t>> {
 };
 
 auto parseCsv(const std::string& path) {
@@ -57,25 +58,39 @@ auto parseCsv(const std::string& path) {
 }
 
 TEST_P(GestureRuneTest, CustomDelegateKnownValue) {
-    const auto& [backend, threadCount, example, optStackSizeBytes, optMemoryLimit] = GetParam();
+    const auto& [backend, threadCount, example, optStackSizeBytes, optMemoryLimit, iterationCount] = GetParam();
+    const auto logger = std::make_shared<const TestLogger>();
+    logger->log(
+        Severity::Info,
+        "GestureRuneTests.cpp",
+        fmt::format(
+            "Test params: tcount={} stackSizeBytes={} memory limit={} iterationCount={}",
+            threadCount,
+            optStackSizeBytes.value_or(0),
+            optMemoryLimit.value_or(0),
+            iterationCount));
     const auto& [examplePath, exampleExpectedOutput] = example;
     const auto input = parseCsv(examplePath);
-    const auto logger = std::make_shared<const TestLogger>();
     auto engine = createEngine(logger, backend, threadCount);
     auto runtime = engine->createRuntime(optStackSizeBytes, optMemoryLimit);
     auto rune = runtime->loadRune({std::make_shared<AccelDelegate>(input)}, g_gestureRuneFilePath);
     ASSERT_TRUE(rune);
 
     // gesture rune outputs string
-    auto result = rune->call();
-    ASSERT_TRUE(result);
-    ASSERT_EQ(result->count(), 1);
-    ASSERT_EQ(result->typeAt(0), rune_vm::IResult::Type::String);
-    const auto firstElement = result->getAt(0);
-    ASSERT_TRUE(std::holds_alternative<std::string_view>(firstElement));
-    const auto& elementResult = std::get<std::string_view>(firstElement);
+    for(auto iteration = 0ul; iteration < iterationCount; ++iteration) {
+        auto result = rune->call();
+        ASSERT_TRUE(result);
+        ASSERT_EQ(result->count(), 1);
+        ASSERT_EQ(result->typeAt(0), rune_vm::IResult::Type::String);
+        const auto firstElement = result->getAt(0);
+        ASSERT_TRUE(std::holds_alternative<std::string_view>(firstElement));
+        const auto& elementResult = std::get<std::string_view>(firstElement);
 
-    ASSERT_EQ(elementResult, exampleExpectedOutput);
+        if(iteration == 0)
+            ASSERT_EQ(elementResult, exampleExpectedOutput);
+        else
+            ASSERT_EQ(elementResult, "<MISSING>"); // gesture rune has debouncing built in
+    }
 }
 
 INSTANTIATE_TEST_SUITE_P(
@@ -86,4 +101,5 @@ INSTANTIATE_TEST_SUITE_P(
         testing::ValuesIn(g_threadCounts),
         testing::ValuesIn(g_gestureExamples),
         testing::Values(std::nullopt, 1 << 15, 1 << 20, uint32_t(-1)),
-        testing::Values(std::nullopt, 1 << 25, uint32_t(-1))));
+        testing::Values(std::nullopt, 1 << 25, uint32_t(-1)),
+        testing::Values(1, 10)));

@@ -5,6 +5,7 @@
 
 #include <cmath>
 #include <random>
+#include <fmt/format.h>
 #include <gtest/gtest.h>
 #include <rune_vm/RuneVm.hpp>
 #include "Common.hpp"
@@ -26,11 +27,20 @@ struct RandDelegate : public CommonTestDelegate<capabilities::Capability::Rand> 
 
 struct SineRuneTest
     : public testing::TestWithParam<
-        std::tuple<WasmBackend, TThreadCount, std::optional<uint32_t>, std::optional<uint32_t>>> {
+        std::tuple<WasmBackend, TThreadCount, std::optional<uint32_t>, std::optional<uint32_t>, size_t>> {
 
     auto loadAndRun(float& output, const std::vector<capabilities::IDelegate::Ptr>& delegates) {
-        const auto [backend, threadCount, optStackSizeBytes, optMemoryLimit] = GetParam();
+        const auto [backend, threadCount, optStackSizeBytes, optMemoryLimit, iterationCount] = GetParam();
         const auto logger = std::make_shared<const TestLogger>();
+        logger->log(
+            Severity::Info,
+            "SineRuneTests.cpp",
+            fmt::format(
+                "Test params: tcount={} stackSizeBytes={} memory limit={} iterationCount={}",
+                threadCount,
+                optStackSizeBytes.value_or(0),
+                optMemoryLimit.value_or(0),
+                iterationCount));
         auto engine = createEngine(logger, backend, threadCount);
         auto runtime = engine->createRuntime(optStackSizeBytes, optMemoryLimit);
         auto rune = runtime->loadRune(delegates, g_testDataDirectory + "/sine/sine.rune");
@@ -38,23 +48,25 @@ struct SineRuneTest
 
         // sine rune outputs [float]
         // assert top-level result is array
-        auto result = rune->call();
-        ASSERT_TRUE(result);
-        ASSERT_EQ(result->count(), 1);
-        ASSERT_EQ(result->typeAt(0), rune_vm::IResult::Type::IResult);
+        for(auto iteration = 0ul; iteration < iterationCount; ++iteration) {
+            auto result = rune->call();
+            ASSERT_TRUE(result);
+            ASSERT_EQ(result->count(), 1);
+            ASSERT_EQ(result->typeAt(0), rune_vm::IResult::Type::IResult);
 
-        // assert it was array with 1 float
-        const auto firstElement = result->getAt(0);
-        ASSERT_TRUE(std::holds_alternative<rune_vm::IResult::Ptr>(firstElement));
-        const auto& elementResult = std::get<rune_vm::IResult::Ptr>(firstElement);
-        ASSERT_EQ(elementResult->count(), 1);
-        ASSERT_EQ(elementResult->typeAt(0), rune_vm::IResult::Type::Float);
-        const auto valueVariant = elementResult->getAt(0);
-        ASSERT_TRUE(std::holds_alternative<float>(valueVariant));
+            // assert it was array with 1 float
+            const auto firstElement = result->getAt(0);
+            ASSERT_TRUE(std::holds_alternative<rune_vm::IResult::Ptr>(firstElement));
+            const auto& elementResult = std::get<rune_vm::IResult::Ptr>(firstElement);
+            ASSERT_EQ(elementResult->count(), 1);
+            ASSERT_EQ(elementResult->typeAt(0), rune_vm::IResult::Type::Float);
+            const auto valueVariant = elementResult->getAt(0);
+            ASSERT_TRUE(std::holds_alternative<float>(valueVariant));
 
-        output = std::get<float>(valueVariant);
-        ASSERT_LE(output, 1.f);
-        ASSERT_GE(output, -1.f);
+            output = std::get<float>(valueVariant);
+            ASSERT_LE(output, 1.f);
+            ASSERT_GE(output, -1.f);
+        }
     }
 
     void testCustomWithInput(const float input, const float expected, const float acceptableDiff) {
@@ -102,4 +114,5 @@ INSTANTIATE_TEST_SUITE_P(
         testing::ValuesIn(g_wasmBackends),
         testing::ValuesIn(g_threadCounts),
         testing::Values(std::nullopt, 1 << 15, 1 << 20, uint32_t(-1)),
-        testing::Values(std::nullopt, 1 << 25, uint32_t(-1))));
+        testing::Values(std::nullopt, 1 << 25, uint32_t(-1)),
+        testing::Values(1, 10)));

@@ -17,13 +17,13 @@ struct TestLogger : public rune_vm::ILogger {
 
     const std::vector<Record>& records() const noexcept;
 
-private:
     // ILogger
     void log(
         const rune_vm::Severity severity,
         const std::string_view module,
         const std::string_view message) const noexcept final;
 
+private:
     // data
     mutable std::vector<Record> m_records;
 };

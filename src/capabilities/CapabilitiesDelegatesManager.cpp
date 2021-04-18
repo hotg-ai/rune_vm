@@ -195,7 +195,7 @@ namespace rune_vm_internal {
 
         m_log.log(
             Severity::Info,
-            fmt::format("Input for apability id={} was written into the buffer", capabilityId));
+            fmt::format("Input for capability id={} was written into the buffer", capabilityId));
         return true;
     }
 
