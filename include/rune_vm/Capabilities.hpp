@@ -9,6 +9,7 @@
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
+#include <type_traits>
 #include <variant>
 #include <rune_vm/DataView.hpp>
 #include <rune_vm/VirtualInterface.hpp>
@@ -39,9 +40,11 @@ namespace rune_vm::capabilities {
     };
 
     struct IDelegate : VirtualInterface<IDelegate> {
+        using TCapabilitiesSet = std::unordered_set<Capability>;
+        
         // list of capabilities that are covered by this delegate
         // you may pass multiple delegates on the rune creation
-        [[nodiscard]] virtual std::unordered_set<Capability> getSupportedCapabilities() const noexcept = 0;
+        [[nodiscard]] virtual TCapabilitiesSet getSupportedCapabilities() const noexcept = 0;
 
         // method is being called to tell the user that specific capability is gonna be required
         // capabilityId is unique, unless requestCapability returns false - in that case it could be reused next time

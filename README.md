@@ -57,19 +57,21 @@ Please pass path to NDK on your system to NDK_PATH variable in the script below.
 
 ```shell
 PROJECT_DIR=$(pwd)
+INSTALL_DIR=$(pwd)
 ABI=arm64-v8a
 CONFIG_POSTFIX=android-rel-$ABI
 BUILD_DIR=build-$CONFIG_POSTFIX
-mkdir $BUILD_DIR && cd $BUILD_DIR
-NDK_PATH=/Users/hotg_delimbetov/Library/Android/sdk/ndk/23.0.7196353
-cmake ../ \
+mkdir -p $BUILD_DIR && cd $BUILD_DIR
+NDK_PATH=/Users/hotg_delimbetov/Library/Android/sdk/ndk/21.1.6352462
+cmake $PROJECT_DIR \
+    -DTFLITE_C_BUILD_SHARED_LIBS=ON \
     -DRUNE_VM_BUILD_TESTS=OFF \
     -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=$PROJECT_DIR/install-$CONFIG_POSTFIX \
+    -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR/install-$CONFIG_POSTFIX \
     -DANDROID_ABI=arm64-v8a \
     -DANDROID_ARM_NEON=ON \
     -DANDROID_NDK=$NDK_PATH \
-    -DANDROID_NATIVE_API_LEVEL=28 \
+    -DANDROID_NATIVE_API_LEVEL=21 \
     -DANDROID_STL=c++_shared \
     -DANDROID_TOOLCHAIN=clang \
     -DCMAKE_TOOLCHAIN_FILE=$NDK_PATH/build/cmake/android.toolchain.cmake
@@ -89,11 +91,11 @@ mkdir $BUILD_DIR && cd $BUILD_DIR
 export POLLY_IOS_DEVELOPMENT_TEAM="YOUR_TEAM_ID"
 export POLLY_IOS_BUNDLE_IDENTIFIER="BUNDLE_ID"
 export PATH_TO_TFLITE_FRAMEWORK="PATH_ON_YOUR_SYSTEM"
-cmake ../ \
+cmake $PROJECT_DIR \
     -GXcode \
     -DRUNE_VM_BUILD_TESTS=OFF \
     -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=$PROJECT_DIR/install-$CONFIG_POSTFIX \
+    -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR/install-$CONFIG_POSTFIX \
     -DCMAKE_TOOLCHAIN_FILE=$PROJECT_DIR/extern/polly/ios.cmake \
     -DRUNE_VM_TFLITE_EXTERNAL=ON \
     -DRUNE_VM_INFERENCE_TFLITE_INCLUDE_DIRS=$PATH_TO_TFLITE_FRAMEWORK/Headers \

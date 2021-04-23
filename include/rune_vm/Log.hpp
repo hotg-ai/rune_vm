@@ -37,15 +37,15 @@ namespace rune_vm {
     struct ILogger: VirtualInterface<ILogger> {
         virtual void log(
             const Severity severity,
-            const std::string_view module,
-            const std::string_view message) const noexcept = 0;
+            const std::string& module,
+            const std::string& message) const noexcept = 0;
     };
 
     class LoggingModule {
     public:
         LoggingModule(const ILogger::CPtr& logger, const std::string& module);
 
-        void log(const Severity severity, const std::string_view message) const noexcept;
+        void log(const Severity severity, const std::string& message) const noexcept;
 
         const ILogger::CPtr& logger() const noexcept;
 

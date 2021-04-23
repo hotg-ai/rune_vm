@@ -13,8 +13,8 @@ const std::vector<TestLogger::Record>& TestLogger::records() const noexcept {
 
 void TestLogger::log(
     const rune_vm::Severity severity,
-    const std::string_view module,
-    const std::string_view message) const noexcept {
+    const std::string& module,
+    const std::string& message) const noexcept {
 //    std::cout << fmt::format("{}@[{}]: {}\n", rune_vm::severityToString(severity), module, message);
-    m_records.push_back(Record{severity, std::string(module), std::string(message)});
+    m_records.push_back(Record{severity, module, message});
 }

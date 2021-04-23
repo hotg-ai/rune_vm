@@ -19,8 +19,7 @@ namespace rune_vm_internal {
 
     private:
         // rune_vm::capabilities::IDelegate
-        [[nodiscard]] std::unordered_set<rune_vm::capabilities::Capability>
-            getSupportedCapabilities() const noexcept final;
+        [[nodiscard]] TCapabilitiesSet getSupportedCapabilities() const noexcept final;
         [[nodiscard]] bool requestCapability(
             const rune_vm::capabilities::Capability capability,
             const rune_vm::capabilities::TId newCapabilityId) noexcept final;
@@ -42,6 +41,6 @@ namespace rune_vm_internal {
         rune_vm::LoggingModule m_log;
         std::random_device m_randomDevice;
         std::unordered_map<rune_vm::capabilities::TId, CapabilityIdData> m_engines;
-        std::unordered_set<rune_vm::capabilities::Capability> m_supportedCapabilities;
+        TCapabilitiesSet m_supportedCapabilities;
     };
 }

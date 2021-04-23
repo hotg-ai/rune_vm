@@ -20,8 +20,8 @@ struct TestLogger : public rune_vm::ILogger {
     // ILogger
     void log(
         const rune_vm::Severity severity,
-        const std::string_view module,
-        const std::string_view message) const noexcept final;
+        const std::string& module,
+        const std::string& message) const noexcept final;
 
 private:
     // data

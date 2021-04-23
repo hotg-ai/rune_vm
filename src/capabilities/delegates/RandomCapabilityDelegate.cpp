@@ -18,7 +18,8 @@ namespace rune_vm_internal {
     }
 
     // IDelegate
-    std::unordered_set<capabilities::Capability> RandomCapabilityDelegate::getSupportedCapabilities() const noexcept {
+    RandomCapabilityDelegate::TCapabilitiesSet
+        RandomCapabilityDelegate::getSupportedCapabilities() const noexcept {
         return m_supportedCapabilities;
     }
     

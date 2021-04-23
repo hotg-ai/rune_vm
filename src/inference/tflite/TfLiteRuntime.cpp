@@ -55,7 +55,7 @@ namespace rune_vm_internal::inference {
         auto buffer = std::array<std::string::value_type, 1024>();
         const auto size = vsnprintf(buffer.data(), sizeof(buffer), format, args);
 
-        m_log.log(Severity::Error, std::string_view(buffer.data(), size));
+        m_log.log(Severity::Error, std::string(buffer.data(), size));
 
         return size;
     }

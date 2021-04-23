@@ -13,7 +13,7 @@ namespace rune_vm {
         CHECK_THROW(logger);
     }
 
-    void LoggingModule::log(const Severity severity, const std::string_view message) const noexcept {
+    void LoggingModule::log(const Severity severity, const std::string& message) const noexcept {
         m_logger->log(severity, m_module, message);
     }
 
