@@ -9,61 +9,8 @@
 #include <Common.hpp>
 #include <OutputManager.hpp>
 
-namespace {
-    using namespace rune_vm;
-    using namespace rune_vm_internal;
-
-    void parse(LoggingModule& log, const nlohmann::json& json, Result& result) {
-        switch(json.type()) {
-            case nlohmann::json::value_t::array: {
-                auto subresult = std::make_shared<Result>(json.size());
-
-                for(const auto& elem: json) {
-                    parse(log, elem, *subresult);
-                }
-
-                result.add(std::move(subresult));
-                break;
-            }
-            case nlohmann::json::value_t::string:
-                result.add(json.get<std::string>());
-                break;
-            case nlohmann::json::value_t::number_integer:
-                result.add(json.get<int32_t>());
-                break;
-            case nlohmann::json::value_t::number_unsigned:
-                result.add(json.get<uint32_t>());
-                break;
-            case nlohmann::json::value_t::number_float:
-                result.add(json.get<float>());
-                break;
-            default:
-                log.log(Severity::Error, fmt::format("Can't parse json: unexpected type: {}", json.type()));
-                CHECK_THROW(false);
-        }
-    }
-
-    std::shared_ptr<Result> parse(LoggingModule& log, const nlohmann::json& json) {
-        auto sizeHint = 1;
-
-        switch(json.type()) {
-            case nlohmann::json::value_t::array: {
-                sizeHint = json.size();
-                break;
-            }
-            default:
-                break;
-        }
-
-        auto result = std::make_shared<Result>(sizeHint);
-
-        parse(log, json, *result);
-
-        return result;
-    }
-}
-
 namespace rune_vm_internal {
+    using namespace rune_vm;
 
     OutputManager::OutputManager(const rune_vm::ILogger::CPtr& logger)
         : m_log(logger, "OutputManager")
@@ -128,14 +75,13 @@ namespace rune_vm_internal {
 
         // atm we only work with Serial and it's guaranteed to be json
         try {
+            const auto bufferStringView = std::string_view(
+                reinterpret_cast<const char*>(buffer.m_data),
+                buffer.m_size);
             m_log.log(
                 Severity::Debug,
-                fmt::format(
-                    "saveOutput: output id={} output={}",
-                    outputId,
-                    std::string_view(reinterpret_cast<const char*>(buffer.m_data), buffer.m_size)));
-            const auto json = nlohmann::json::parse(buffer);
-            auto result = parse(m_log, json);
+                fmt::format("saveOutput: output id={} output={}", outputId, bufferStringView));
+            auto result = std::make_shared<JsonResult>(bufferStringView);
 
             // save
             iter->second = std::move(result);
@@ -152,7 +98,7 @@ namespace rune_vm_internal {
         return true;
     }
 
-    std::optional<Result::Ptr> OutputManager::consumeOutput(const TOutputId outputId) noexcept {
+    std::optional<rune_vm::IResult::Ptr> OutputManager::consumeOutput(const TOutputId outputId) noexcept {
         const auto [iter, found] = find(m_results, outputId);
         if(!found) {
             m_log.log(Severity::Error, fmt::format("Failed to find output id={}", outputId));

@@ -13,6 +13,7 @@
     #include <tensorflow/lite/c/c_api.h>
 #endif
 
+#include <new>
 #include <fmt/format.h>
 #include <Common.hpp>
 #include <inference/tflite/TfLiteRuntime.hpp>
@@ -64,11 +65,13 @@ namespace rune_vm_internal::inference {
     TfLiteRuntimeModel::TfLiteRuntimeModel(
         const rune_vm::ILogger::CPtr& logger,
         std::shared_ptr<TfLiteLogger>&& tfLogger,
+        std::unique_ptr<const uint8_t[]>&& tfModelData,
         std::shared_ptr<TfLiteModel>&& tfModel,
         std::shared_ptr<TfLiteInterpreterOptions>&& tfOptions,
         std::shared_ptr<TfLiteInterpreter>&& tfInterpreter)
         : m_log(logger, "TfLiteRuntimeModel")
         , m_tfLogger(std::move(tfLogger))
+        , m_modelData(std::move(tfModelData))
         , m_model(std::move(tfModel))
         , m_options(std::move(tfOptions))
         , m_interpreter(std::move(tfInterpreter)) {
@@ -163,7 +166,19 @@ namespace rune_vm_internal::inference {
         const uint32_t outputs) {
         m_log.log(Severity::Info, fmt::format("Loading tf model of size={}", model.m_size));
         CHECK_THROW(model.m_data && model.m_size);
-        auto tfModel = std::shared_ptr<TfLiteModel>(TfLiteModelCreate(model.m_data, model.m_size), TfLiteModelDelete);
+        // copy model data into internal storage. This is not the best approach,
+        // but currently we can't use passed model blob indefinetly
+        // TODO: fix it
+        auto alignedData = std::unique_ptr<uint8_t[]>(
+            new (std::align_val_t(constants::g_cacheLineFriendlyAlignment)) uint8_t[model.m_size]);
+        CHECK_THROW(reinterpret_cast<uint64_t>(alignedData.get()) % constants::g_cacheLineFriendlyAlignment == 0);
+        auto alignedDataView = rune_vm::DataView<uint8_t>(alignedData.get(), model.m_size);
+        
+        std::memcpy(alignedDataView.m_data, model.m_data, model.m_size);
+        
+        auto tfModel = std::shared_ptr<TfLiteModel>(
+            TfLiteModelCreate(alignedDataView.m_data, alignedDataView.m_size),
+            TfLiteModelDelete);
         CHECK_THROW(tfModel);
         auto tfOptions = std::shared_ptr<TfLiteInterpreterOptions>(
             TfLiteInterpreterOptionsCreate(),
@@ -191,6 +206,7 @@ namespace rune_vm_internal::inference {
         return std::make_shared<TfLiteRuntimeModel>(
             m_log.logger(),
             std::move(tfLogger),
+            std::move(alignedData),
             std::move(tfModel),
             std::move(tfOptions),
             std::move(tfInterpreter));

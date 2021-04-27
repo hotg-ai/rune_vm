@@ -147,11 +147,37 @@ namespace rune_vm_internal {
         return m_data.size();
     }
 
-    [[nodiscard]] std::string Result::asJson() const noexcept {
+    std::string Result::asJson() const noexcept {
         try {
             return parse(*this).dump();
         } catch(const std::exception& e) {
             return "";
         }
+    }
+
+    // JsonResult
+    JsonResult::JsonResult(const std::string_view json)
+        : m_json(json) {
+        nlohmann::json::parse(m_json); // throws if it's not a json
+    }
+        
+
+    // IResult
+    IResult::TVariant JsonResult::getAt(const uint32_t idx) const {
+        CHECK_THROW(idx < count());
+        return m_json;
+    }
+
+    IResult::Type JsonResult::typeAt(const uint32_t idx) const {
+        CHECK_THROW(idx < count());
+        return Type::Json;
+    }
+
+    uint32_t JsonResult::count() const noexcept {
+        return 1;
+    }
+
+    std::string JsonResult::asJson() const noexcept {
+        return m_json;
     }
 }

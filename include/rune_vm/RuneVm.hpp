@@ -24,6 +24,7 @@ namespace rune_vm {
 
     struct IResult : VirtualInterface<IResult> {
         enum class Type: uint8_t {
+            Json,
             Uint32,
             Int32,
             Float,

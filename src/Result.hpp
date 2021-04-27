@@ -34,4 +34,19 @@ namespace rune_vm_internal {
         // data
         std::vector<TInternalVariant> m_data;
     };
+
+    class JsonResult : public rune_vm::IResult {
+    public:
+        JsonResult(const std::string_view json);
+        
+    private:
+        // IResult
+        [[nodiscard]] TVariant getAt(const uint32_t idx) const final;
+        [[nodiscard]] Type typeAt(const uint32_t idx) const final;
+        [[nodiscard]] uint32_t count() const noexcept final;
+        [[nodiscard]] std::string asJson() const noexcept final;
+
+        // data
+        std::string m_json;
+    };
 }

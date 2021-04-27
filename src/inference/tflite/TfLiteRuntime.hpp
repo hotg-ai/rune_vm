@@ -27,6 +27,7 @@ namespace rune_vm_internal::inference {
         TfLiteRuntimeModel(
             const rune_vm::ILogger::CPtr& logger,
             std::shared_ptr<TfLiteLogger>&& tfLogger,
+            std::unique_ptr<const uint8_t[]>&& tfModelData,
             std::shared_ptr<TfLiteModel>&& tfModel,
             std::shared_ptr<TfLiteInterpreterOptions>&& tfOptions,
             std::shared_ptr<TfLiteInterpreter>&& tfInterpreter);
@@ -42,6 +43,7 @@ namespace rune_vm_internal::inference {
         // data
         rune_vm::LoggingModule m_log;
         std::shared_ptr<TfLiteLogger> m_tfLogger;
+        std::unique_ptr<const uint8_t[]> m_modelData;
         std::shared_ptr<TfLiteModel> m_model;
         std::shared_ptr<TfLiteInterpreterOptions> m_options;
         // interpreter is model-specific
