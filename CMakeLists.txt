@@ -12,6 +12,7 @@ option(
     "To link against external tflite binary. If set, you will have to provide RUNE_VM_INFERENCE_TFLITE_INCLUDE_DIRS and RUNE_VM_INFERENCE_TFLITE_LIBRARIES too"
     OFF)
 option(RUNE_VM_BUILD_TESTS "Build rune vm tests" ON)
+option(RUNE_VM_BUILD_EXAMPLES "Build rune vm with examples" ON)
 
 # Add external dependencies
 ## wasm3-c
@@ -125,6 +126,14 @@ if(RUNE_VM_BUILD_TESTS)
     # Add tests directory
     add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/tests)
 endif(RUNE_VM_BUILD_TESTS)
+
+# Examples
+if(RUNE_VM_BUILD_EXAMPLES)
+    message(STATUS "RUNE_VM examples are enabled")
+
+    # Add examples directory
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/examples)
+endif(RUNE_VM_BUILD_EXAMPLES)
 
 # Installation rules
 if(RUNE_VM_INSTALL)

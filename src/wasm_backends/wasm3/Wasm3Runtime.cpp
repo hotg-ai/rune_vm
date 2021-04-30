@@ -113,6 +113,7 @@ namespace rune_vm_internal {
         m_log.log(Severity::Debug, "Wasm3Runtime()");
     }
 
+    // TODO: make delegates truly rune-independent: add rune_id or something to the loadRune return AND 2. pass that rune_id to delegates callbacks
     IRune::Ptr Wasm3Runtime::loadRune(
         const std::vector<rune_vm::capabilities::IDelegate::Ptr>& delegates,
         const DataView<const uint8_t> data) {

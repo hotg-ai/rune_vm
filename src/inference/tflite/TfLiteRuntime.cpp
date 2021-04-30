@@ -122,7 +122,7 @@ namespace rune_vm_internal::inference {
                 const auto byteCount = TfLiteTensorByteSize(tensor);
                 CHECK_THROW(byteCount == output.m_size);
 
-                // copy input into tensor
+                // copy output from tensor
                 const auto copyResult = TfLiteTensorCopyToBuffer(tensor, output.m_data, byteCount);
                 CHECK_THROW(copyResult == kTfLiteOk);
             }
