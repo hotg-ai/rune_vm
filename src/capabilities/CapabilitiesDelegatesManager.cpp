@@ -74,6 +74,7 @@ namespace rune_vm_internal {
     }
 
     std::optional<capabilities::TId> CapabilitiesDelegatesManager::createCapability(
+        const rune_vm::TRuneId runeId,
         const capabilities::Capability capability) {
         const auto optDelegate = getDelegateForCapability(m_log, m_delegates, capability);
         if(!optDelegate) {
@@ -85,7 +86,7 @@ namespace rune_vm_internal {
 
         auto& delegate = *optDelegate;
         const auto allocatedCapabilityId = m_idCounter + 1;
-        const auto result = delegate->requestCapability(capability, allocatedCapabilityId);
+        const auto result = delegate->requestCapability(runeId, capability, allocatedCapabilityId);
         if(!result) {
             m_log.log(
                 Severity::Error,
@@ -118,6 +119,7 @@ namespace rune_vm_internal {
     }
 
     bool CapabilitiesDelegatesManager::setCapabilityParam(
+        const rune_vm::TRuneId runeId,
         const capabilities::TId capabilityId,
         const capabilities::TKey& key,
         const capabilities::Parameter& parameter) noexcept {
@@ -129,7 +131,11 @@ namespace rune_vm_internal {
 
         // if the key is there already, value will not be updated
         auto [iter, inserted] = iterId->second.m_parameters.emplace(key, parameter);
-        const auto requestResult = iterId->second.owner()->requestCapabilityParamChange(capabilityId, key, parameter);
+        const auto requestResult = iterId->second.owner()->requestCapabilityParamChange(
+            runeId,
+            capabilityId,
+            key,
+            parameter);
         if(!requestResult) {
             m_log.log(
                 Severity::Error,
@@ -167,6 +173,7 @@ namespace rune_vm_internal {
     }
 
     bool CapabilitiesDelegatesManager::getInput(
+        const rune_vm::TRuneId runeId,
         const DataView<uint8_t> buffer,
         const capabilities::TId capabilityId) noexcept {
         if(!buffer.m_data) {
@@ -187,7 +194,7 @@ namespace rune_vm_internal {
             return false;
         }
 
-        const auto requestResult = iterId->second.owner()->requestRuneInputFromCapability(buffer, capabilityId);
+        const auto requestResult = iterId->second.owner()->requestRuneInputFromCapability(runeId, buffer, capabilityId);
         if(!requestResult) {
             m_log.log(Severity::Error, fmt::format("Delegate for capability id={} denied input request", capabilityId));
             return false;

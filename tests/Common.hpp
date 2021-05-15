@@ -20,6 +20,10 @@ struct CommonTestDelegate : public rune_vm::capabilities::IDelegate {
     CommonTestDelegate(std::vector<uint8_t> input)
         : m_input(std::move(input)) {}
 
+    void setRuneId(const rune_vm::TRuneId runeId) {
+        m_runeId = runeId;
+    }
+
 private:
     // rune_vm::capabilities::IDelegate
     [[nodiscard]] std::unordered_set<rune_vm::capabilities::Capability>
@@ -28,24 +32,30 @@ private:
     }
 
     [[nodiscard]] bool requestCapability(
+        const rune_vm::TRuneId runeId,
         const rune_vm::capabilities::Capability requestedCapability,
         const rune_vm::capabilities::TId newCapabilityId) noexcept final {
+        [&] { if(m_runeId) ASSERT_EQ(*m_runeId, runeId); }();
         [&] { ASSERT_EQ(requestedCapability, capability); }();
         m_allocatedId = newCapabilityId;
         return true;
     }
 
     [[nodiscard]] bool requestCapabilityParamChange(
+        const rune_vm::TRuneId runeId,
         const rune_vm::capabilities::TId capabilityId,
         const rune_vm::capabilities::TKey& key,
         const rune_vm::capabilities::Parameter& parameter) noexcept final {
+        [&] { if(m_runeId) ASSERT_EQ(*m_runeId, runeId); }();
         [&] { ASSERT_EQ(*m_allocatedId, capabilityId); }();
         return true;
     }
 
     [[nodiscard]] bool requestRuneInputFromCapability(
+        const rune_vm::TRuneId runeId,
         const rune_vm::DataView<uint8_t> buffer,
         const rune_vm::capabilities::TId capabilityId) noexcept final {
+        [&] { ASSERT_EQ(*m_runeId, runeId); }();
         [&] { ASSERT_EQ(*m_allocatedId, capabilityId); }();
         [&] { ASSERT_EQ(m_input.size(), buffer.m_size); }();
         std::memcpy(buffer.m_data, m_input.data(), m_input.size());
@@ -53,6 +63,7 @@ private:
     }
 
     //
+    std::optional<rune_vm::TRuneId> m_runeId;
     std::vector<uint8_t> m_input;
     std::optional<rune_vm::capabilities::TId> m_allocatedId;
 };

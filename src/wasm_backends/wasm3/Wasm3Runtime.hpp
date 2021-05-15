@@ -34,6 +34,7 @@ namespace rune_vm_internal {
 
         // data
         rune_vm::LoggingModule m_log;
+        rune_vm::TRuneId m_runeIdCounter;
         std::shared_ptr<M3Environment> m_environment;
         std::shared_ptr<M3Runtime> m_runtime;
         inference::ModelManager::Ptr m_modelManager;

@@ -240,6 +240,7 @@ struct AllInOneDelegate : public rune_vm::capabilities::IDelegate {
         
         // Requests specific capability from the user
         [[nodiscard]] bool requestCapability(
+            const rune_vm::TRuneId runeId,
             const rune_vm::capabilities::Capability capability,
             const rune_vm::capabilities::TId newCapabilityId) noexcept final {
             // check if this delegates support request capability
@@ -252,6 +253,7 @@ struct AllInOneDelegate : public rune_vm::capabilities::IDelegate {
         
         // Parametrizes capability id with some values. E.g. for image it might be its size
         [[nodiscard]] bool requestCapabilityParamChange(
+            const rune_vm::TRuneId runeId,
             const rune_vm::capabilities::TId capabilityId,
             const rune_vm::capabilities::TKey& key,
             const rune_vm::capabilities::Parameter& parameter) noexcept final {
@@ -264,6 +266,7 @@ struct AllInOneDelegate : public rune_vm::capabilities::IDelegate {
         
         // This callback is called to request new input data for the Rune. Expect it to be invoked after you call IRune::call().
         [[nodiscard]] bool requestRuneInputFromCapability(
+            const rune_vm::TRuneId runeId,
             const rune_vm::DataView<uint8_t> buffer,
             const rune_vm::capabilities::TId capabilityId) noexcept final {
             if(buffer.m_size != m_input->m_size) {

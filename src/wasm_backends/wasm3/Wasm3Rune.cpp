@@ -198,19 +198,21 @@ namespace rune_vm_internal {
 
     Wasm3Rune::Wasm3Rune(
         const rune_vm::ILogger::CPtr& logger,
+        const rune_vm::TRuneId runeId,
         std::shared_ptr<M3Module> module,
         std::shared_ptr<M3Runtime> runtime,
         const std::vector<rune_vm::capabilities::IDelegate::Ptr>& delegates,
         const inference::ModelManager::Ptr& modelManager)
-        : m_log(logger, "Wasm3Rune")
+        : m_log(logger, fmt::format("Wasm3Rune id={}", runeId))
         , m_module(std::move(module))
         , m_runtime(std::move(runtime))
         , m_hostContext(
             logger,
+            runeId,
             std::make_shared<CapabilitiesDelegatesManager>(logger, delegates),
             modelManager)
         , m_callFunction(nullptr) {
-        m_log.log(Severity::Debug, "Wasm3Rune()");
+        m_log.log(Severity::Debug, fmt::format("Wasm3Rune() id={}", runeId));
 
         // Link host functions
         using namespace rune_interop::host_function_rune_name;
@@ -260,6 +262,10 @@ namespace rune_vm_internal {
     }
 
     // IRune
+    TRuneId Wasm3Rune::id() const noexcept {
+        return m_hostContext.runeId();
+    }
+
     capabilities::IContext::Ptr Wasm3Rune::getCapabilitiesContext() const noexcept {
         return m_hostContext.capabilitiesManager();
     }

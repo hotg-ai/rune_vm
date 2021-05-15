@@ -21,13 +21,16 @@ namespace rune_vm_internal {
         // rune_vm::capabilities::IDelegate
         [[nodiscard]] TCapabilitiesSet getSupportedCapabilities() const noexcept final;
         [[nodiscard]] bool requestCapability(
+            const rune_vm::TRuneId runeId,
             const rune_vm::capabilities::Capability capability,
             const rune_vm::capabilities::TId newCapabilityId) noexcept final;
         [[nodiscard]] bool requestCapabilityParamChange(
+            const rune_vm::TRuneId runeId,
             const rune_vm::capabilities::TId capabilityId,
             const rune_vm::capabilities::TKey& key,
             const rune_vm::capabilities::Parameter& parameter) noexcept final;
         [[nodiscard]] bool requestRuneInputFromCapability(
+            const rune_vm::TRuneId runeId,
             const rune_vm::DataView<uint8_t> buffer,
             const rune_vm::capabilities::TId capabilityId) noexcept final;
 

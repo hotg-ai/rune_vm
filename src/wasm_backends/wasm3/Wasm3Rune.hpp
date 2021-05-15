@@ -18,6 +18,7 @@ namespace rune_vm_internal {
     public:
         Wasm3Rune(
             const rune_vm::ILogger::CPtr& logger,
+            const rune_vm::TRuneId runeId,
             std::shared_ptr<M3Module> module,
             std::shared_ptr<M3Runtime> runtime,
             const std::vector<rune_vm::capabilities::IDelegate::Ptr>& delegates,
@@ -25,6 +26,7 @@ namespace rune_vm_internal {
 
     private:
         // IRune
+        [[nodiscard]] rune_vm::TRuneId id() const noexcept final;
         [[nodiscard]] rune_vm::capabilities::IContext::Ptr getCapabilitiesContext() const noexcept final;
         [[nodiscard]] rune_vm::IResult::Ptr call() final;
 

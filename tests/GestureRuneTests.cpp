@@ -73,8 +73,11 @@ TEST_P(GestureRuneTest, CustomDelegateKnownValue) {
     const auto input = parseCsv(examplePath);
     auto engine = createEngine(logger, backend, threadCount);
     auto runtime = engine->createRuntime(optStackSizeBytes, optMemoryLimit);
-    auto rune = runtime->loadRune({std::make_shared<AccelDelegate>(input)}, g_gestureRuneFilePath);
+    auto delegates = std::vector<capabilities::IDelegate::Ptr>({std::make_shared<AccelDelegate>(input)});
+    auto rune = runtime->loadRune(delegates, g_gestureRuneFilePath);
     ASSERT_TRUE(rune);
+    for(auto& delegate: delegates)
+        static_cast<AccelDelegate&>(*delegate).setRuneId(rune->id());
 
     // gesture rune outputs string
     for(auto iteration = 0ul; iteration < iterationCount; ++iteration) {

@@ -167,7 +167,7 @@ namespace rune_vm_internal::inference {
         m_log.log(Severity::Info, fmt::format("Loading tf model of size={}", model.m_size));
         CHECK_THROW(model.m_data && model.m_size);
         // copy model data into internal storage. This is not the best approach,
-        // but currently we can't use passed model blob indefinetly
+        // but currently we can't use passed model blob indefinitely
         // TODO: fix it
         auto alignedData = std::unique_ptr<uint8_t[]>(
             new (std::align_val_t(constants::g_cacheLineFriendlyAlignment)) uint8_t[model.m_size]);

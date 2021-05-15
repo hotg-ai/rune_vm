@@ -24,9 +24,12 @@ namespace rune_vm_internal {
     }
     
     bool RandomCapabilityDelegate::requestCapability(
+        const TRuneId runeId,
         const capabilities::Capability capability,
         const capabilities::TId newCapabilityId) noexcept {
-        m_log.log(Severity::Debug, fmt::format("requestCapability capability={} id={}", capability, newCapabilityId));
+        m_log.log(
+            Severity::Debug,
+            fmt::format("requestCapability rune_id={} capability={} id={}", runeId, capability, newCapabilityId));
         const auto [iter, found] = find(m_engines, newCapabilityId);
         if(found) {
             m_log.log(
@@ -58,12 +61,13 @@ namespace rune_vm_internal {
     }
 
     bool RandomCapabilityDelegate::requestCapabilityParamChange(
+        const TRuneId runeId,
         const capabilities::TId capabilityId,
         const capabilities::TKey& key,
         const capabilities::Parameter& parameter) noexcept {
         m_log.log(
             Severity::Debug,
-            fmt::format("requestCapabilityParamChange id={} key={} param={}", capabilityId, key, parameter));
+            fmt::format("requestCapabilityParamChange rune_id={} id={} key={} param={}", runeId, capabilityId, key, parameter));
         const auto [iter, found] = find(m_engines, capabilityId);
         if(!found) {
             m_log.log(
@@ -96,11 +100,12 @@ namespace rune_vm_internal {
     }
 
     bool RandomCapabilityDelegate::requestRuneInputFromCapability(
+        const TRuneId runeId,
         const DataView<uint8_t> buffer,
         const capabilities::TId capabilityId) noexcept {
         m_log.log(
             Severity::Debug,
-            fmt::format("requestRuneInputFromCapability id={} buffer bytes length={}", capabilityId, buffer.m_size));
+            fmt::format("requestRuneInputFromCapability rune_id={} id={} buffer bytes length={}", runeId, capabilityId, buffer.m_size));
         const auto [iter, found] = find(m_engines, capabilityId);
         if(!found) {
             m_log.log(

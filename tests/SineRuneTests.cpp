@@ -6,6 +6,7 @@
 #include <cmath>
 #include <random>
 #include <fmt/format.h>
+#include <nlohmann/json.hpp>
 #include <gtest/gtest.h>
 #include <rune_vm/RuneVm.hpp>
 #include "Common.hpp"
@@ -45,6 +46,8 @@ struct SineRuneTest
         auto runtime = engine->createRuntime(optStackSizeBytes, optMemoryLimit);
         auto rune = runtime->loadRune(delegates, g_testDataDirectory + "/sine/sine.rune");
         ASSERT_TRUE(rune);
+        for(auto& delegate: delegates)
+            static_cast<RandDelegate&>(*delegate).setRuneId(rune->id());
 
         // sine rune outputs [float]
         // assert top-level result is array
@@ -52,24 +55,26 @@ struct SineRuneTest
             auto result = rune->call();
             ASSERT_TRUE(result);
             ASSERT_EQ(result->count(), 1);
-            ASSERT_EQ(result->typeAt(0), rune_vm::IResult::Type::IResult);
+            ASSERT_EQ(result->typeAt(0), rune_vm::IResult::Type::Json);
+
+            const auto jsonResult = nlohmann::json::parse(result->asJson());
 
             // assert it was array with 1 float
-            const auto firstElement = result->getAt(0);
-            ASSERT_TRUE(std::holds_alternative<rune_vm::IResult::Ptr>(firstElement));
-            const auto& elementResult = std::get<rune_vm::IResult::Ptr>(firstElement);
-            ASSERT_EQ(elementResult->count(), 1);
-            ASSERT_EQ(elementResult->typeAt(0), rune_vm::IResult::Type::Float);
-            const auto valueVariant = elementResult->getAt(0);
-            ASSERT_TRUE(std::holds_alternative<float>(valueVariant));
+            ASSERT_TRUE(jsonResult.is_array());
+            const auto& firstElement = jsonResult[0];
+            ASSERT_TRUE(firstElement.is_number_float());
+            const auto& elementResult = firstElement.get<float>();
 
-            output = std::get<float>(valueVariant);
+            output = elementResult;
             ASSERT_LE(output, 1.f);
             ASSERT_GE(output, -1.f);
         }
     }
 
-    void testCustomWithInput(const float input, const float expected, const float acceptableDiff) {
+    void testCustomWithInput(
+        const float input,
+        const float expected,
+        const float acceptableDiff) {
         const auto delegate = std::make_shared<RandDelegate>(input);
         auto output = 100.f;
 

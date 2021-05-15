@@ -24,6 +24,7 @@ namespace {
     template<typename... TDeleter>
     auto createRune(
         const LoggingModule& log,
+        TRuneId& runeIdCounterRef,
         M3Environment& environment,
         std::shared_ptr<M3Runtime> runtime,
         const inference::ModelManager::Ptr& modelManager,
@@ -64,14 +65,25 @@ namespace {
         *loaded = true;
 
         // Create delegates manager
-        return std::shared_ptr<rune_vm_internal::Wasm3Rune>(
+        const auto rune = std::shared_ptr<rune_vm_internal::Wasm3Rune>(
             new rune_vm_internal::Wasm3Rune(
                 log.logger(),
+                runeIdCounterRef,
                 std::move(module),
                 std::move(runtime),
                 delegates,
                 modelManager),
             std::forward<TDeleter>(deleter)...);
+
+        ++runeIdCounterRef;
+
+        if(runeIdCounterRef == std::numeric_limits<std::decay_t<decltype(runeIdCounterRef)>>::max()) {
+            log.log(
+                Severity::Warning,
+                fmt::format("Rune id counter has hit max value={}. Next allocation will overflow it", runeIdCounterRef));
+        }
+
+        return rune;
     }
 
     auto createRuntime(
@@ -107,19 +119,19 @@ namespace rune_vm_internal {
         const std::optional<uint32_t> optMemoryLimit,
         const inference::ModelManager::Ptr& modelManager)
         : m_log(logger, "Wasm3Runtime")
+        , m_runeIdCounter(0)
         , m_environment(environment)
         , m_runtime(createRuntime(m_log, m_environment, optStackSizeBytes, optMemoryLimit))
         , m_modelManager(modelManager) {
         m_log.log(Severity::Debug, "Wasm3Runtime()");
     }
-
-    // TODO: make delegates truly rune-independent: add rune_id or something to the loadRune return AND 2. pass that rune_id to delegates callbacks
+    
     IRune::Ptr Wasm3Runtime::loadRune(
         const std::vector<rune_vm::capabilities::IDelegate::Ptr>& delegates,
         const DataView<const uint8_t> data) {
         CHECK_THROW(data.m_data && data.m_size);
         m_log.log(Severity::Info, "loadRune from binary blob");
-        return createRune(m_log, *m_environment, m_runtime, m_modelManager, delegates, data);
+        return createRune(m_log, m_runeIdCounter, *m_environment, m_runtime, m_modelManager, delegates, data);
     }
 
     IRune::Ptr Wasm3Runtime::loadRune(
@@ -143,6 +155,7 @@ namespace rune_vm_internal {
             mmapedFile->size());
         return createRune(
             m_log,
+            m_runeIdCounter,
             *m_environment,
             m_runtime,
             m_modelManager,

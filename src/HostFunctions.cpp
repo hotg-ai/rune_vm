@@ -34,15 +34,21 @@ namespace {
 namespace rune_vm_internal::host_functions {
     HostContext::HostContext(
         const rune_vm::ILogger::CPtr& logger,
+        const rune_vm::TRuneId runeId,
         CapabilitiesDelegatesManager::Ptr&& capabilitiesManager,
         const inference::ModelManager::Ptr& modelManager)
         : m_log(logger, "HostContext")
+        , m_runeId(runeId)
         , m_capabilitiesManager(std::move(capabilitiesManager))
         , m_modelManager(modelManager)
         , m_outputManager(logger) {
         CHECK_THROW(m_capabilitiesManager);
         CHECK_THROW(m_modelManager);
         m_log.log(Severity::Debug, "HostContext()");
+    }
+
+    rune_vm::TRuneId HostContext::runeId() const noexcept {
+        return m_runeId;
     }
 
     const rune_vm::LoggingModule& HostContext::log() const noexcept {
@@ -72,7 +78,7 @@ namespace rune_vm_internal::host_functions {
         }
 
         context->log().log(Severity::Debug, fmt::format("requestCapability: capabilityType={}", capabilityType));
-        const auto optCapabilityId = context->capabilitiesManager()->createCapability(capabilityType);
+        const auto optCapabilityId = context->capabilitiesManager()->createCapability(context->runeId(), capabilityType);
         if(!optCapabilityId) {
             context->log().log(Severity::Error, fmt::format("Failed to create capability type={}", capabilityType));
             return rune_interop::RC_InputError;
@@ -143,6 +149,7 @@ namespace rune_vm_internal::host_functions {
         }
 
         const auto setResult = context->capabilitiesManager()->setCapabilityParam(
+            context->runeId(),
             capabilityId,
             keyStr,
             capabilities::Parameter{std::move(parameter)});
@@ -172,7 +179,7 @@ namespace rune_vm_internal::host_functions {
             return rune_interop::RC_InputError;
         }
 
-        const auto inputResult = context->capabilitiesManager()->getInput(buffer, capabilityId);
+        const auto inputResult = context->capabilitiesManager()->getInput(context->runeId(), buffer, capabilityId);
         if(!inputResult) {
             context->log().log(Severity::Error, "requestProviderResponse failed to get input");
             return rune_interop::RC_InputError;

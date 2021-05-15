@@ -18,9 +18,11 @@ namespace rune_vm_internal::host_functions {
     public:
         HostContext(
             const rune_vm::ILogger::CPtr& logger,
+            const rune_vm::TRuneId runeId,
             CapabilitiesDelegatesManager::Ptr&& capabilitiesManager,
             const inference::ModelManager::Ptr& modelManager);
 
+        rune_vm::TRuneId runeId() const noexcept;
         const rune_vm::LoggingModule& log() const noexcept;
         const CapabilitiesDelegatesManager::Ptr& capabilitiesManager() noexcept;
         const CapabilitiesDelegatesManager::Ptr& capabilitiesManager() const noexcept;
@@ -30,6 +32,7 @@ namespace rune_vm_internal::host_functions {
     private:
         // data
         rune_vm::LoggingModule m_log;
+        rune_vm::TRuneId m_runeId;
         CapabilitiesDelegatesManager::Ptr m_capabilitiesManager;
         inference::ModelManager::Ptr m_modelManager;
         OutputManager m_outputManager;
