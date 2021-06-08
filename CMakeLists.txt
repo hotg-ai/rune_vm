@@ -42,18 +42,6 @@ endif(NOT RUNE_VM_TFLITE_EXTERNAL)
 set(RUNE_VM_STATIC_LIBRARIES "" CACHE INTERNAL "")
 set(RUNE_VM_INCLUDES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 set(RUNE_VM_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
-# # io (formatting)
-set(RUNE_VM_IO_TARGET rune_vm_io)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/io)
-# # wasm_backends
-set(RUNE_VM_WASM_BACKEND_TARGET rune_vm_wasm_backend)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/wasm_backends)
-# # capabilities
-set(RUNE_VM_CAPABILITIES_TARGET rune_vm_capabilities)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/capabilities)
-# # inference
-set(RUNE_VM_INFERENCE_BACKEND_TARGET rune_vm_inference_backend)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/inference)
 
 # Sources & Headers
 set(
@@ -94,6 +82,20 @@ endif(ANDROID)
 set(RUNE_VM_TARGET_NAME ${PROJECT_NAME})
 add_library(${RUNE_VM_TARGET_NAME} ${RUNE_VM_LIBRARY_TYPE} ${SOURCES} ${HEADERS})
 set(RUNE_VM_STATIC_LIBRARIES ${RUNE_VM_STATIC_LIBRARIES} ${RUNE_VM_TARGET_NAME} CACHE INTERNAL "")
+
+# # io (formatting)
+set(RUNE_VM_IO_TARGET rune_vm_io)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/io)
+# # wasm_backends
+set(RUNE_VM_WASM_BACKEND_TARGET rune_vm_wasm_backend)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/wasm_backends)
+# # capabilities
+set(RUNE_VM_CAPABILITIES_TARGET rune_vm_capabilities)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/capabilities)
+# # inference
+set(RUNE_VM_INFERENCE_BACKEND_TARGET rune_vm_inference_backend)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/inference)
+
 
 # Link dependencies
 target_link_libraries(

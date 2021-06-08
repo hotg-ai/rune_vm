@@ -23,6 +23,7 @@ set(RUNE_VM_STATIC_LIBRARIES ${RUNE_VM_STATIC_LIBRARIES} ${RUNE_VM_WASM_BACKEND_
 target_link_libraries(
     ${RUNE_VM_WASM_BACKEND_IMPL_TARGET}
     PUBLIC
+    ${RUNE_VM_TARGET_NAME}
     fmt::fmt)
 
 # Link private dependencies

@@ -19,7 +19,8 @@ set(RUNE_VM_STATIC_LIBRARIES ${RUNE_VM_STATIC_LIBRARIES} ${RUNE_VM_CAPABILITIES_
 target_link_libraries(
     ${RUNE_VM_CAPABILITIES_DELEGATES_TARGET}
     PUBLIC
-    ${RUNE_VM_IO_TARGET})
+    ${RUNE_VM_IO_TARGET}
+    ${RUNE_VM_TARGET_NAME})
 
 # Add include directories
 target_include_directories(
