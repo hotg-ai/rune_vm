@@ -6,6 +6,7 @@
 #pragma once
 
 #include <array>
+#include <cstring>
 #include <optional>
 #include <vector>
 #include <gtest/gtest.h>
