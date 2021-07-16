@@ -22,6 +22,8 @@ namespace rune_vm_internal::rune_interop {
         constexpr const char g_requestOutput[] = "request_output";
         constexpr const char g_consumeOutput[] = "consume_output";
         constexpr const char g_debug[] = "_debug";
+        constexpr const char g_runeModelLoad[] = "rune_model_load";
+        constexpr const char g_runeModelInfer[] = "rune_model_infer";
     }
 
     namespace rune_function_name {

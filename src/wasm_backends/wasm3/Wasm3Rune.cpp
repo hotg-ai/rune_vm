@@ -193,6 +193,23 @@ namespace {
     }
 }
 
+#define LINK(functionName, function) {                                           \
+             constexpr auto signature = wasm3_interop::getSignature(function);   \
+                m_log.log(                                                       \
+                    Severity::Info,                                              \
+                    fmt::format("Linking to function name={} signature={}", functionName, signature.data())); \
+             checkedCall(                                                        \
+                m_log,                                                           \
+                m_runtime,                                                       \
+                m3_LinkRawFunctionEx,                                            \
+                m_module.get(),                                                  \
+                rune_interop::g_moduleName,                                      \
+                functionName,                                                    \
+                signature.data(),                                                \
+                wasm3_interop::wrap_helper<function>::wrap_fn,                   \
+                &m_hostContext);                                                 \
+                }
+
 namespace rune_vm_internal {
     using namespace rune_vm;
 
@@ -216,20 +233,39 @@ namespace rune_vm_internal {
 
         // Link host functions
         using namespace rune_interop::host_function_rune_name;
-        link<g_requestCapability>();
+        LINK(g_requestCapability, rune_vm_internal::host_functions::requestCapability);
         try {
             // requestCapabilitySetParam seems to be optional
-            link<g_requestCapabilitySetParam>();
+            LINK(g_requestCapabilitySetParam, rune_vm_internal::host_functions::requestCapabilitySetParam);
         } catch(const std::exception& e) {
             // TODO: confirm or remove
             m_log.log(Severity::Warning, "Wasm3Rune(): func=requestCapabilitySetParam was not found in a Rune");
         }
-        link<g_requestProviderResponse>();
-        link<g_tfmPreloadModel>();
-        link<g_tfmModelInvoke>();
-        link<g_requestOutput>();
-        link<g_consumeOutput>();
-        link<g_debug>();
+        LINK(g_requestProviderResponse, rune_vm_internal::host_functions::requestProviderResponse);
+        LINK(g_tfmPreloadModel, rune_vm_internal::host_functions::tfmPreloadModel);
+        LINK(g_tfmModelInvoke, rune_vm_internal::host_functions::tfmModelInvoke);
+        LINK(g_requestOutput, rune_vm_internal::host_functions::requestOutput);
+        LINK(g_consumeOutput, rune_vm_internal::host_functions::consumeOutput);
+        LINK(g_debug, rune_vm_internal::host_functions::debug);
+        LINK(g_runeModelLoad, rune_vm_internal::host_functions::runeModelLoad);
+        LINK(g_runeModelInfer, rune_vm_internal::host_functions::runeModelInfer);
+
+//        link<g_requestCapability>();
+//        try {
+//            // requestCapabilitySetParam seems to be optional
+//            link<g_requestCapabilitySetParam>();
+//        } catch(const std::exception& e) {
+//            // TODO: confirm or remove
+//            m_log.log(Severity::Warning, "Wasm3Rune(): func=requestCapabilitySetParam was not found in a Rune");
+//        }
+//        link<g_requestProviderResponse>();
+//        link<g_tfmPreloadModel>();
+//        link<g_tfmModelInvoke>();
+//        link<g_requestOutput>();
+//        link<g_consumeOutput>();
+//        link<g_debug>();
+//        link<g_runeModelLoad>();
+//        link<g_runeModelInfer>();
 
         // Lookup manifest function
         auto manifestFunction = IM3Function();

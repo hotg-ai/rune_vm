@@ -66,11 +66,24 @@ namespace rune_vm_internal::host_functions {
         const rune_vm::DataView<const uint8_t> model,
         const uint32_t inputs,
         const uint32_t outputs) noexcept;
+
+    TModelId runeModelLoad(
+            HostContext* context,
+            const rune_vm::DataView<const char> mimeType,
+            const rune_vm::DataView<const uint8_t> modelData,
+            const rune_vm::DataView<const rune_vm::DataView<const char>> inputs,
+            const rune_vm::DataView<const rune_vm::DataView<const char>> outputs) noexcept;
+
     TResult tfmModelInvoke(
         HostContext* context,
         const TModelId modelId,
         const rune_vm::DataView<const uint8_t> input,
         const rune_vm::DataView<uint8_t> output) noexcept;
+
+    TResult runeModelInfer(HostContext* context,
+            const TModelId modelId,
+            const void *inputs,
+            void *outputs) noexcept;
 
     // // Output helpers
     TOutputId requestOutput(HostContext* context, const rune_interop::OutputType outputType) noexcept;
@@ -103,6 +116,10 @@ namespace rune_vm_internal::host_functions {
             return consumeOutput;
         else if constexpr(stringViewName == rune_interop::host_function_rune_name::g_debug)
             return debug;
+        else if constexpr(stringViewName == rune_interop::host_function_rune_name::g_runeModelLoad)
+            return runeModelLoad;
+        else if constexpr(stringViewName == rune_interop::host_function_rune_name::g_runeModelInfer)
+            return runeModelInfer;
         else {
             static_assert([](auto) { return false; }(stringViewName));
         }

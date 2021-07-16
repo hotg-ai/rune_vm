@@ -319,4 +319,85 @@ namespace rune_vm_internal::host_functions {
 
         return 0;
     }
+
+    TModelId runeModelLoad(HostContext *context, const rune_vm::DataView<const char> mimeType,
+                           const rune_vm::DataView<const uint8_t> modelData,
+                           const rune_vm::DataView<const rune_vm::DataView<const char> > inputs,
+                           const rune_vm::DataView<const rune_vm::DataView<const char> > outputs) noexcept
+    {
+        auto modelId = tfmPreloadModel(context, modelData, inputs.m_size, outputs.m_size);
+
+        if (modelId >= 0) {
+            auto model = context->modelManager()->getModel(modelId).value_or(nullptr);
+
+            if (model) {
+                model->inputDescriptors.clear();
+                model->inputDescriptors.reserve(inputs.m_size);
+
+                model->outputDescriptors.clear();
+                model->outputDescriptors.reserve(outputs.m_size);
+
+                for (const auto &input: inputs) {
+                    model->inputDescriptors.push_back(input);
+                }
+
+                for (const auto &output: outputs) {
+                    model->outputDescriptors.push_back(output);
+                }
+            }
+        }
+
+        return modelId;
+    }
+
+    TResult runeModelInfer(HostContext *context,
+                           const TModelId modelId,
+                           const void* inputs,
+                           void* outputs) noexcept
+    {
+        context->log().log(
+            Severity::Debug,
+            fmt::format(
+                "tfmModelInvoke: model id={}",
+                modelId));
+
+        auto model = context->modelManager()->getModel(modelId).value_or(nullptr);
+
+        if (model) {
+            std::vector<rune_vm::DataView<const uint8_t>> inputTensors(model->inputDescriptors.size(), DataView<const uint8_t>());
+            std::vector<rune_vm::DataView<uint8_t>> outputTensors(model->outputDescriptors.size(), DataView<uint8_t>());
+
+            uint8_t* inputTensorBasePointer = static_cast<uint8_t*>(const_cast<void*>(inputs));
+            uint8_t* outputTensorBasePointer = static_cast<uint8_t*>(outputs);
+
+            for (size_t i = 0; i < inputTensors.size(); i++) {
+                size_t currentTensorBytes = model->inputDescriptors[i].byteCount();
+                inputTensors[i].m_data = inputTensorBasePointer;
+                inputTensors[i].m_size = currentTensorBytes;
+
+                inputTensorBasePointer += currentTensorBytes;
+            }
+
+            for (size_t i = 0; i < outputTensors.size(); i++) {
+                size_t currentTensorBytes = model->outputDescriptors[i].byteCount();
+                outputTensors[i].m_data = outputTensorBasePointer;
+                outputTensors[i].m_size = currentTensorBytes;
+
+                outputTensorBasePointer += currentTensorBytes;
+            }
+
+            const auto runResult = context->modelManager()->runModel(modelId,
+                                                                     rune_vm::DataView<const rune_vm::DataView<const uint8_t>>(inputTensors.data(), inputTensors.size()),
+                                                                     rune_vm::DataView<rune_vm::DataView<uint8_t>> (outputTensors.data(), outputTensors.size()));
+            if(!runResult) {
+                context->log().log(Severity::Error, fmt::format("tfmModelInvoke: failed to run model id={}", modelId));
+                return rune_interop::RC_InputError;
+            }
+
+            return 0;
+        }
+
+        return rune_interop::RC_InputError;
+    }
+
 }
