@@ -94,34 +94,4 @@ namespace rune_vm_internal::host_functions {
 
     // // Debug helpers
     TResult debug(HostContext* context, const rune_vm::DataView<const char> message) noexcept;
-
-    // Link wasm names to actual functions
-    template<auto name>
-    constexpr auto nameToFunctionMap() noexcept {
-        constexpr auto stringViewName = std::string_view(name);
-
-        if constexpr(stringViewName == rune_interop::host_function_rune_name::g_requestCapability)
-            return requestCapability;
-        else if constexpr(stringViewName == rune_interop::host_function_rune_name::g_requestCapabilitySetParam)
-            return requestCapabilitySetParam;
-        else if constexpr(stringViewName == rune_interop::host_function_rune_name::g_requestProviderResponse)
-            return requestProviderResponse;
-        else if constexpr(stringViewName == rune_interop::host_function_rune_name::g_tfmPreloadModel)
-            return tfmPreloadModel;
-        else if constexpr(stringViewName == rune_interop::host_function_rune_name::g_tfmModelInvoke)
-            return tfmModelInvoke;
-        else if constexpr(stringViewName == rune_interop::host_function_rune_name::g_requestOutput)
-            return requestOutput;
-        else if constexpr(stringViewName == rune_interop::host_function_rune_name::g_consumeOutput)
-            return consumeOutput;
-        else if constexpr(stringViewName == rune_interop::host_function_rune_name::g_debug)
-            return debug;
-        else if constexpr(stringViewName == rune_interop::host_function_rune_name::g_runeModelLoad)
-            return runeModelLoad;
-        else if constexpr(stringViewName == rune_interop::host_function_rune_name::g_runeModelInfer)
-            return runeModelInfer;
-        else {
-            static_assert([](auto) { return false; }(stringViewName));
-        }
-    }
 }
