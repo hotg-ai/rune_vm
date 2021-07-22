@@ -82,8 +82,8 @@ namespace rune_vm_internal::host_functions {
 
     TResult runeModelInfer(HostContext* context,
             const TModelId modelId,
-            const void *inputs,
-            void *outputs) noexcept;
+            const uint8_t **inputs,
+            uint8_t **outputs) noexcept;
 
     // // Output helpers
     TOutputId requestOutput(HostContext* context, const rune_interop::OutputType outputType) noexcept;

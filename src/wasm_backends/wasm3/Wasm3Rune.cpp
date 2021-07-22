@@ -74,6 +74,18 @@ namespace {
             dest = (void*) m3ApiOffsetToPtr(* ((u32 *) (psp++)));
         };
 
+        template<typename T>
+        void arg_from_stack(T** &dest, TStackType &psp, IM3Runtime runtime, TMemType _mem) {
+            checkMemoryThrow<T**>(psp, runtime, _mem);
+            dest = (uint8_t**) m3ApiOffsetToPtr(* ((u32 *) (psp++)));
+        };
+
+        template<typename T>
+        void arg_from_stack(const T** &dest, TStackType &psp, IM3Runtime runtime, TMemType _mem) {
+            checkMemoryThrow<T**>(psp, runtime, _mem);
+            dest = (const uint8_t**) m3ApiOffsetToPtr(* ((u32 *) (psp++)));
+        };
+
         template <typename ...Args>
         static void get_args_from_stack(TStackType &sp, IM3Runtime runtime, TMemType mem, std::tuple<Args...> &tuple) {
             std::apply([&](auto &... item) {
@@ -166,6 +178,8 @@ namespace {
         template<> struct m3_type_to_sig<void> : m3_sig<'v'> {};
         template<> struct m3_type_to_sig<void *> : m3_sig<'*'> {};
         template<> struct m3_type_to_sig<const void *> : m3_sig<'*'> {};
+        template<> struct m3_type_to_sig<uint8_t **> : m3_sig<'*'> {};
+        template<> struct m3_type_to_sig<const uint8_t **> : m3_sig<'*'> {};
         template<typename T, typename TSize> struct m3_type_to_sig<rune_vm::DataView<T, TSize>> : m3_sig<'*', 'i'> {};
 
 

@@ -352,8 +352,8 @@ namespace rune_vm_internal::host_functions {
 
     TResult runeModelInfer(HostContext *context,
                            const TModelId modelId,
-                           const void* inputs,
-                           void* outputs) noexcept
+                           const uint8_t **inputs,
+                           uint8_t **outputs) noexcept
     {
         context->log().log(
             Severity::Debug,
@@ -367,23 +367,22 @@ namespace rune_vm_internal::host_functions {
             std::vector<rune_vm::DataView<const uint8_t>> inputTensors(model->inputDescriptors.size(), DataView<const uint8_t>());
             std::vector<rune_vm::DataView<uint8_t>> outputTensors(model->outputDescriptors.size(), DataView<uint8_t>());
 
-            uint8_t* inputTensorBasePointer = static_cast<uint8_t*>(const_cast<void*>(inputs));
-            uint8_t* outputTensorBasePointer = static_cast<uint8_t*>(outputs);
+            uint8_t** inputTensorBasePointer = const_cast<uint8_t**>(inputs);
+            uint8_t** outputTensorBasePointer = outputs;
 
             for (size_t i = 0; i < inputTensors.size(); i++) {
                 size_t currentTensorBytes = model->inputDescriptors[i].byteCount();
-                inputTensors[i].m_data = inputTensorBasePointer;
+                inputTensors[i].m_data = *inputTensorBasePointer;
                 inputTensors[i].m_size = currentTensorBytes;
-
-                inputTensorBasePointer += currentTensorBytes;
+                inputTensorBasePointer++;
             }
 
             for (size_t i = 0; i < outputTensors.size(); i++) {
                 size_t currentTensorBytes = model->outputDescriptors[i].byteCount();
-                outputTensors[i].m_data = outputTensorBasePointer;
+                outputTensors[i].m_data = *outputTensorBasePointer;
                 outputTensors[i].m_size = currentTensorBytes;
 
-                outputTensorBasePointer += currentTensorBytes;
+                outputTensorBasePointer++;
             }
 
             const auto runResult = context->modelManager()->runModel(modelId,
