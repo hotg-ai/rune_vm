@@ -322,26 +322,26 @@ namespace rune_vm_internal::host_functions {
 
     TModelId runeModelLoad(HostContext *context, const rune_vm::DataView<const char> mimeType,
                            const rune_vm::DataView<const uint8_t> modelData,
-                           const rune_vm::DoubleNestedDataView<const char> inputs,
-                           const rune_vm::DoubleNestedDataView<const char> outputs) noexcept {
-        auto modelId = tfmPreloadModel(context, modelData, inputs.m_size, outputs.m_size);
+                           const std::vector<std::string> inputs,
+                           const std::vector<std::string> outputs) noexcept {
+        auto modelId = tfmPreloadModel(context, modelData, inputs.size(), outputs.size());
 
         if (modelId >= 0) {
             auto model = context->modelManager()->getModel(modelId).value_or(nullptr);
 
             if (model) {
                 model->inputDescriptors.clear();
-                model->inputDescriptors.reserve(inputs.m_size);
+                model->inputDescriptors.reserve(inputs.size());
 
                 model->outputDescriptors.clear();
-                model->outputDescriptors.reserve(outputs.m_size);
+                model->outputDescriptors.reserve(outputs.size());
 
-                for (size_t i = 0; i < inputs.m_size; i++) {
-                    model->inputDescriptors.push_back({std::string(inputs.m_data[i].m_data, inputs.m_data[i].m_size)});
+                for (const auto& input: inputs) {
+                    model->inputDescriptors.push_back({input});
                 }
 
-                for (size_t i = 0; i < outputs.m_size; i++) {
-                    model->outputDescriptors.push_back({std::string(outputs.m_data[i].m_data, outputs.m_data[i].m_size)});
+                for (const auto& output: outputs) {
+                    model->outputDescriptors.push_back({output});
                 }
             }
         }

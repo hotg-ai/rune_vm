@@ -62,14 +62,22 @@ namespace {
             dest.m_size = *(TSize *) (psp++);
         }
 
-        template<typename T, typename TSize>
-        void arg_from_stack(rune_vm::DoubleNestedDataView<T, TSize>& dest, TStackType &psp, IM3Runtime runtime, TMemType _mem) {
+        template <>
+        void arg_from_stack(std::vector<std::string>& dest, TStackType &psp, IM3Runtime runtime, TMemType _mem) {
 //            checkMemoryThrow(psp, dest, runtime, _mem);
-            dest.m_data = (rune_vm::DataView<T, TSize>*) m3ApiOffsetToPtr(* ((u32 *) (psp++)));
-            dest.m_size = *(TSize *) (psp++);
 
-            for (size_t i = 0; i < dest.m_size; i++) {
-                dest.m_data[i].m_data = (T*) m3ApiOffsetToPtr((size_t)(dest.m_data[i].m_data));
+            // For std::vector<std::string> , we expect the memory layout in the wasm linear memory to look like:
+            // rune::DataView<rune::DataView<char>>
+            // A rune::DataView<T> is something like struct { T* m_data; size_t m_size; }
+            // Problem is that the nested dataview's m_data is also a wasm lineage memory offset.
+            auto data = (uint32_t*) m3ApiOffsetToPtr(* ((u32 *) (psp++)));
+            size_t count = *(uint32_t *) (psp++);
+
+            dest.resize(count);
+
+            // So we manually create strings out of nested dataviews to prevent unnecessary headaches
+            for (size_t i = 0; i < count; i++) {
+                dest[i] = std::string((char*) m3ApiOffsetToPtr((size_t)(data[2*i])) , data[2*i + 1]);
             }
         }
 
@@ -191,8 +199,8 @@ namespace {
         template<> struct m3_type_to_sig<const void *> : m3_sig<'*'> {};
         template<> struct m3_type_to_sig<uint8_t **> : m3_sig<'*'> {};
         template<> struct m3_type_to_sig<const uint8_t **> : m3_sig<'*'> {};
+        template<> struct m3_type_to_sig<std::vector<std::string>> : m3_sig<'*', 'i'> {};
         template<typename T, typename TSize> struct m3_type_to_sig<rune_vm::DataView<T, TSize>> : m3_sig<'*', 'i'> {};
-        template<typename T, typename TSize> struct m3_type_to_sig<rune_vm::DoubleNestedDataView<T, TSize>> : m3_sig<'*', 'i'> {};
 
         template<typename Ret, typename ... Args>
         struct m3_signature {

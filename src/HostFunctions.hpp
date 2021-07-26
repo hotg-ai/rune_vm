@@ -71,8 +71,8 @@ namespace rune_vm_internal::host_functions {
             HostContext* context,
             const rune_vm::DataView<const char> mimeType,
             const rune_vm::DataView<const uint8_t> modelData,
-            const rune_vm::DoubleNestedDataView<const char> inputs,
-            const rune_vm::DoubleNestedDataView<const char> outputs) noexcept;
+            const std::vector<std::string> inputs,
+            const std::vector<std::string> outputs) noexcept;
 
     TResult tfmModelInvoke(
         HostContext* context,
