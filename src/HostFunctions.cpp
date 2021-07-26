@@ -322,9 +322,8 @@ namespace rune_vm_internal::host_functions {
 
     TModelId runeModelLoad(HostContext *context, const rune_vm::DataView<const char> mimeType,
                            const rune_vm::DataView<const uint8_t> modelData,
-                           const rune_vm::DataView<const rune_vm::DataView<const char> > inputs,
-                           const rune_vm::DataView<const rune_vm::DataView<const char> > outputs) noexcept
-    {
+                           const rune_vm::DoubleNestedDataView<const char> inputs,
+                           const rune_vm::DoubleNestedDataView<const char> outputs) noexcept {
         auto modelId = tfmPreloadModel(context, modelData, inputs.m_size, outputs.m_size);
 
         if (modelId >= 0) {
@@ -337,12 +336,12 @@ namespace rune_vm_internal::host_functions {
                 model->outputDescriptors.clear();
                 model->outputDescriptors.reserve(outputs.m_size);
 
-                for (const auto &input: inputs) {
-                    model->inputDescriptors.push_back(input);
+                for (size_t i = 0; i < inputs.m_size; i++) {
+                    model->inputDescriptors.push_back({std::string(inputs.m_data[i].m_data, inputs.m_data[i].m_size)});
                 }
 
-                for (const auto &output: outputs) {
-                    model->outputDescriptors.push_back(output);
+                for (size_t i = 0; i < outputs.m_size; i++) {
+                    model->outputDescriptors.push_back({std::string(outputs.m_data[i].m_data, outputs.m_data[i].m_size)});
                 }
             }
         }

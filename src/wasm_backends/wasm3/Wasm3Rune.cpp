@@ -62,6 +62,17 @@ namespace {
             dest.m_size = *(TSize *) (psp++);
         }
 
+        template<typename T, typename TSize>
+        void arg_from_stack(rune_vm::DoubleNestedDataView<T, TSize>& dest, TStackType &psp, IM3Runtime runtime, TMemType _mem) {
+//            checkMemoryThrow(psp, dest, runtime, _mem);
+            dest.m_data = (rune_vm::DataView<T, TSize>*) m3ApiOffsetToPtr(* ((u32 *) (psp++)));
+            dest.m_size = *(TSize *) (psp++);
+
+            for (size_t i = 0; i < dest.m_size; i++) {
+                dest.m_data[i].m_data = (T*) m3ApiOffsetToPtr((size_t)(dest.m_data[i].m_data));
+            }
+        }
+
         template<typename T>
         void arg_from_stack(T* &dest, TStackType &psp, IM3Runtime runtime, TMemType _mem) {
             checkMemoryThrow<T*>(psp, runtime, _mem);
@@ -181,7 +192,7 @@ namespace {
         template<> struct m3_type_to_sig<uint8_t **> : m3_sig<'*'> {};
         template<> struct m3_type_to_sig<const uint8_t **> : m3_sig<'*'> {};
         template<typename T, typename TSize> struct m3_type_to_sig<rune_vm::DataView<T, TSize>> : m3_sig<'*', 'i'> {};
-
+        template<typename T, typename TSize> struct m3_type_to_sig<rune_vm::DoubleNestedDataView<T, TSize>> : m3_sig<'*', 'i'> {};
 
         template<typename Ret, typename ... Args>
         struct m3_signature {

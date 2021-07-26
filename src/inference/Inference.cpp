@@ -44,10 +44,8 @@ namespace rune_vm_internal::inference {
         return bytesPerUnit * std::accumulate(shape.begin(), shape.end(), decltype(shape)::value_type(0));
     }
 
-    TensorDescriptor::TensorDescriptor(const rune_vm::DataView<const char> &descriptor)
+    TensorDescriptor::TensorDescriptor(const std::string &descriptorString)
     {
-        const std::string descriptorString(descriptor.m_data, descriptor.m_size);
-
         try {
             std::regex componentMatcher("(.*)\\[(.*)\\]");
             std::smatch componentMatches;

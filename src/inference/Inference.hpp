@@ -40,7 +40,7 @@ namespace rune_vm_internal::inference {
         DataType dataType;
         size_t byteCount();
 
-        TensorDescriptor(const rune_vm::DataView<const char> &descriptor);
+        TensorDescriptor(const std::string &descriptorString);
     };
 
     struct IModel: IElement<rune_vm::VirtualInterface<IModel>, IVisitor> {
