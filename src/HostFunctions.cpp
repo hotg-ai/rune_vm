@@ -324,6 +324,15 @@ namespace rune_vm_internal::host_functions {
                            const rune_vm::DataView<const uint8_t> modelData,
                            const std::vector<std::string> inputs,
                            const std::vector<std::string> outputs) noexcept {
+
+        context->log().log(
+            Severity::Debug,
+            fmt::format(
+                "rune_model_load: model size={} input size = {} output size = {}",
+                modelData.m_size,
+                inputs.size(),
+                outputs.size()));
+
         auto modelId = tfmPreloadModel(context, modelData, inputs.size(), outputs.size());
 
         if (modelId >= 0) {
@@ -357,7 +366,7 @@ namespace rune_vm_internal::host_functions {
         context->log().log(
             Severity::Debug,
             fmt::format(
-                "tfmModelInvoke: model id={}",
+                "rune_model_infer: model id={}",
                 modelId));
 
         auto model = context->modelManager()->getModel(modelId).value_or(nullptr);
@@ -388,7 +397,7 @@ namespace rune_vm_internal::host_functions {
                                                                      rune_vm::DataView<const rune_vm::DataView<const uint8_t>>(inputTensors.data(), inputTensors.size()),
                                                                      rune_vm::DataView<rune_vm::DataView<uint8_t>> (outputTensors.data(), outputTensors.size()));
             if(!runResult) {
-                context->log().log(Severity::Error, fmt::format("tfmModelInvoke: failed to run model id={}", modelId));
+                context->log().log(Severity::Error, fmt::format("rune_model_infer: failed to run model id={}", modelId));
                 return rune_interop::RC_InputError;
             }
 
