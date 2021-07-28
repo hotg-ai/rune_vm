@@ -31,7 +31,7 @@ namespace rune_vm_internal::inference {
         }
     }
 
-    size_t TensorDescriptor::byteCount()
+    size_t TensorDescriptor::byteCount() const
     {
         // FIXME: implement for datatype = string
         size_t bytesPerUnit = (dataType == DataType__NoType || dataType == DataType__Bool || dataType == DataType__UInt8 || dataType == DataType__Int8 ) ? 1:

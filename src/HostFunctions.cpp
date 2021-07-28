@@ -360,8 +360,8 @@ namespace rune_vm_internal::host_functions {
 
     TResult runeModelInfer(HostContext *context,
                            const TModelId modelId,
-                           const uint8_t **inputs,
-                           uint8_t **outputs) noexcept
+                           const rune_vm::WasmPtr inputs,
+                           rune_vm::WasmPtr outputs) noexcept
     {
         context->log().log(
             Severity::Debug,
@@ -375,22 +375,19 @@ namespace rune_vm_internal::host_functions {
             std::vector<rune_vm::DataView<const uint8_t>> inputTensors(model->inputDescriptors.size(), DataView<const uint8_t>());
             std::vector<rune_vm::DataView<uint8_t>> outputTensors(model->outputDescriptors.size(), DataView<uint8_t>());
 
-            uint8_t** inputTensorBasePointer = const_cast<uint8_t**>(inputs);
-            uint8_t** outputTensorBasePointer = outputs;
+            //inputs.data() -> u8** in the wasm memory
+            //so we go there to see what u8* lives there
+            const u32* inputBase = (u32*)inputs.deref();
+            const u32* outputBase = (u32*)outputs.deref();
 
             for (size_t i = 0; i < inputTensors.size(); i++) {
-                size_t currentTensorBytes = model->inputDescriptors[i].byteCount();
-                inputTensors[i].m_data = *inputTensorBasePointer;
-                inputTensors[i].m_size = currentTensorBytes;
-                inputTensorBasePointer++;
+                inputTensors[i].m_data = static_cast<const uint8_t*>(inputs.deref(inputBase[i]));
+                inputTensors[i].m_size = model->inputDescriptors[i].byteCount();
             }
 
             for (size_t i = 0; i < outputTensors.size(); i++) {
-                size_t currentTensorBytes = model->outputDescriptors[i].byteCount();
-                outputTensors[i].m_data = *outputTensorBasePointer;
-                outputTensors[i].m_size = currentTensorBytes;
-
-                outputTensorBasePointer++;
+                outputTensors[i].m_data = static_cast<uint8_t*>(outputs.deref(outputBase[i]));
+                outputTensors[i].m_size = model->outputDescriptors[i].byteCount();
             }
 
             const auto runResult = context->modelManager()->runModel(modelId,

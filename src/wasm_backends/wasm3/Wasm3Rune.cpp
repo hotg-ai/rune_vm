@@ -81,6 +81,13 @@ namespace {
             }
         }
 
+        template <>
+        void arg_from_stack(rune_vm::WasmPtr& dest, TStackType &psp, IM3Runtime runtime, TMemType _mem) {
+//             checkMemoryThrow(psp, dest, runtime, _mem);
+            dest.m_mem = _mem;
+            dest.m_offset = *(u32*) (psp++);
+        }
+
         template<typename T>
         void arg_from_stack(T* &dest, TStackType &psp, IM3Runtime runtime, TMemType _mem) {
             checkMemoryThrow<T*>(psp, runtime, _mem);
@@ -91,18 +98,6 @@ namespace {
         void arg_from_stack(const T* &dest, TStackType &psp, IM3Runtime runtime, TMemType _mem) {
             checkMemoryThrow<T*>(psp, runtime, _mem);
             dest = (void*) m3ApiOffsetToPtr(* ((u32 *) (psp++)));
-        };
-
-        template<typename T>
-        void arg_from_stack(T** &dest, TStackType &psp, IM3Runtime runtime, TMemType _mem) {
-            checkMemoryThrow<T**>(psp, runtime, _mem);
-            dest = (uint8_t**) m3ApiOffsetToPtr(* ((u32 *) (psp++)));
-        };
-
-        template<typename T>
-        void arg_from_stack(const T** &dest, TStackType &psp, IM3Runtime runtime, TMemType _mem) {
-            checkMemoryThrow<T**>(psp, runtime, _mem);
-            dest = (const uint8_t**) m3ApiOffsetToPtr(* ((u32 *) (psp++)));
         };
 
         template <typename ...Args>
@@ -197,8 +192,8 @@ namespace {
         template<> struct m3_type_to_sig<void> : m3_sig<'v'> {};
         template<> struct m3_type_to_sig<void *> : m3_sig<'*'> {};
         template<> struct m3_type_to_sig<const void *> : m3_sig<'*'> {};
-        template<> struct m3_type_to_sig<uint8_t **> : m3_sig<'*'> {};
-        template<> struct m3_type_to_sig<const uint8_t **> : m3_sig<'*'> {};
+        template<> struct m3_type_to_sig<rune_vm::WasmPtr> : m3_sig<'*'> {};
+        template<> struct m3_type_to_sig<const rune_vm::WasmPtr> : m3_sig<'*'> {};
         template<> struct m3_type_to_sig<std::vector<std::string>> : m3_sig<'*', 'i'> {};
         template<typename T, typename TSize> struct m3_type_to_sig<rune_vm::DataView<T, TSize>> : m3_sig<'*', 'i'> {};
 

@@ -38,9 +38,9 @@ namespace rune_vm_internal::inference {
 
         std::vector<int> shape;
         DataType dataType;
-        size_t byteCount();
 
         TensorDescriptor(const std::string &descriptorString);
+        size_t byteCount() const;
     };
 
     struct IModel: IElement<rune_vm::VirtualInterface<IModel>, IVisitor> {

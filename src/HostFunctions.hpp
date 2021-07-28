@@ -8,6 +8,7 @@
 #include <cstdint>
 #include <rune_vm/Capabilities.hpp>
 #include <rune_vm/Log.hpp>
+#include <rune_vm/WasmPtr.hpp>
 #include <capabilities/CapabilitiesDelegatesManager.hpp>
 #include <inference/ModelManager.hpp>
 #include <OutputManager.hpp>
@@ -82,8 +83,8 @@ namespace rune_vm_internal::host_functions {
 
     TResult runeModelInfer(HostContext* context,
             const TModelId modelId,
-            const uint8_t **inputs,
-            uint8_t **outputs) noexcept;
+            const rune_vm::WasmPtr inputs,
+            rune_vm::WasmPtr outputs) noexcept;
 
     // // Output helpers
     TOutputId requestOutput(HostContext* context, const rune_interop::OutputType outputType) noexcept;
