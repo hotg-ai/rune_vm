@@ -41,7 +41,7 @@ namespace rune_vm_internal::inference {
                               (dataType == DataType__Complex128)                                                                                         ? 8:
                                                                                                                                                            0;
 
-        return bytesPerUnit * std::accumulate(shape.begin(), shape.end(), decltype(shape)::value_type(0));
+        return bytesPerUnit * std::accumulate(shape.begin(), shape.end(), decltype(shape)::value_type(1),  std::multiplies<int>());
     }
 
     TensorDescriptor::TensorDescriptor(const std::string &descriptorString)
