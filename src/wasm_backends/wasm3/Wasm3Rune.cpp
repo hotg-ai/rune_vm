@@ -62,6 +62,32 @@ namespace {
             dest.m_size = *(TSize *) (psp++);
         }
 
+        template <>
+        void arg_from_stack(std::vector<std::string>& dest, TStackType &psp, IM3Runtime runtime, TMemType _mem) {
+//            checkMemoryThrow(psp, dest, runtime, _mem);
+
+            // For std::vector<std::string> , we expect the memory layout in the wasm linear memory to look like:
+            // rune::DataView<rune::DataView<char>>
+            // A rune::DataView<T> is something like struct { T* m_data; size_t m_size; }
+            // Problem is that the nested dataview's m_data is also a wasm lineage memory offset.
+            auto data = (uint32_t*) m3ApiOffsetToPtr(* ((u32 *) (psp++)));
+            size_t count = *(uint32_t *) (psp++);
+
+            dest.resize(count);
+
+            // So we manually create strings out of nested dataviews to prevent unnecessary headaches
+            for (size_t i = 0; i < count; i++) {
+                dest[i] = std::string((char*) m3ApiOffsetToPtr((size_t)(data[2*i])) , data[2*i + 1]);
+            }
+        }
+
+        template <>
+        void arg_from_stack(rune_vm::WasmPtr& dest, TStackType &psp, IM3Runtime runtime, TMemType _mem) {
+//             checkMemoryThrow(psp, dest, runtime, _mem);
+            dest.m_mem = _mem;
+            dest.m_offset = *(u32*) (psp++);
+        }
+
         template<typename T>
         void arg_from_stack(T* &dest, TStackType &psp, IM3Runtime runtime, TMemType _mem) {
             checkMemoryThrow<T*>(psp, runtime, _mem);
@@ -166,8 +192,10 @@ namespace {
         template<> struct m3_type_to_sig<void> : m3_sig<'v'> {};
         template<> struct m3_type_to_sig<void *> : m3_sig<'*'> {};
         template<> struct m3_type_to_sig<const void *> : m3_sig<'*'> {};
+        template<> struct m3_type_to_sig<rune_vm::WasmPtr> : m3_sig<'*'> {};
+        template<> struct m3_type_to_sig<const rune_vm::WasmPtr> : m3_sig<'*'> {};
+        template<> struct m3_type_to_sig<std::vector<std::string>> : m3_sig<'*', 'i'> {};
         template<typename T, typename TSize> struct m3_type_to_sig<rune_vm::DataView<T, TSize>> : m3_sig<'*', 'i'> {};
-
 
         template<typename Ret, typename ... Args>
         struct m3_signature {
@@ -193,6 +221,21 @@ namespace {
     }
 }
 
+//TODO: Turn this into a proper function
+#define LINK(functionName, function) {                                                      \
+    constexpr auto signature = wasm3_interop::getSignature(function);                       \
+    m_log.log(Severity::Info,                                                               \
+              fmt::format("Linking to function name={} signature={}",                       \
+                          functionName, signature.data()));                                 \
+    const auto result = m3_LinkRawFunctionEx(m_module.get(),                                \
+                                             rune_interop::g_moduleName,                    \
+                                             functionName,                                  \
+                                             signature.data(),                              \
+                                             wasm3_interop::wrap_helper<function>::wrap_fn, \
+                                             &m_hostContext);                               \
+    if (result != m3Err_functionLookupFailed) checkM3Error(m_log, m_runtime, result);       \
+}
+
 namespace rune_vm_internal {
     using namespace rune_vm;
 
@@ -216,20 +259,16 @@ namespace rune_vm_internal {
 
         // Link host functions
         using namespace rune_interop::host_function_rune_name;
-        link<g_requestCapability>();
-        try {
-            // requestCapabilitySetParam seems to be optional
-            link<g_requestCapabilitySetParam>();
-        } catch(const std::exception& e) {
-            // TODO: confirm or remove
-            m_log.log(Severity::Warning, "Wasm3Rune(): func=requestCapabilitySetParam was not found in a Rune");
-        }
-        link<g_requestProviderResponse>();
-        link<g_tfmPreloadModel>();
-        link<g_tfmModelInvoke>();
-        link<g_requestOutput>();
-        link<g_consumeOutput>();
-        link<g_debug>();
+        LINK(g_requestCapability, rune_vm_internal::host_functions::requestCapability);
+        LINK(g_requestCapabilitySetParam, rune_vm_internal::host_functions::requestCapabilitySetParam);
+        LINK(g_requestProviderResponse, rune_vm_internal::host_functions::requestProviderResponse);
+        LINK(g_tfmPreloadModel, rune_vm_internal::host_functions::tfmPreloadModel);
+        LINK(g_tfmModelInvoke, rune_vm_internal::host_functions::tfmModelInvoke);
+        LINK(g_requestOutput, rune_vm_internal::host_functions::requestOutput);
+        LINK(g_consumeOutput, rune_vm_internal::host_functions::consumeOutput);
+        LINK(g_debug, rune_vm_internal::host_functions::debug);
+        LINK(g_runeModelLoad, rune_vm_internal::host_functions::runeModelLoad);
+        LINK(g_runeModelInfer, rune_vm_internal::host_functions::runeModelInfer);
 
         // Lookup manifest function
         auto manifestFunction = IM3Function();
@@ -289,26 +328,5 @@ namespace rune_vm_internal {
         CHECK_THROW(optResult);
 
         return *optResult;
-    }
-
-    // Internal
-    template<auto functionName>
-    void Wasm3Rune::link() {
-        constexpr auto function = host_functions::nameToFunctionMap<functionName>();
-        constexpr auto signature = wasm3_interop::getSignature(function);
-
-        m_log.log(
-            Severity::Info,
-            fmt::format("Linking to function name={} signature={}", functionName, signature.data()));
-        checkedCall(
-            m_log,
-            m_runtime,
-            m3_LinkRawFunctionEx,
-            m_module.get(),
-            rune_interop::g_moduleName,
-            functionName,
-            signature.data(),
-            wasm3_interop::wrap_helper<function>::wrap_fn,
-            &m_hostContext);
     }
 }

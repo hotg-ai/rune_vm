@@ -8,6 +8,7 @@
 #include <cstdint>
 #include <rune_vm/Capabilities.hpp>
 #include <rune_vm/Log.hpp>
+#include <rune_vm/WasmPtr.hpp>
 #include <capabilities/CapabilitiesDelegatesManager.hpp>
 #include <inference/ModelManager.hpp>
 #include <OutputManager.hpp>
@@ -66,11 +67,24 @@ namespace rune_vm_internal::host_functions {
         const rune_vm::DataView<const uint8_t> model,
         const uint32_t inputs,
         const uint32_t outputs) noexcept;
+
+    TModelId runeModelLoad(
+            HostContext* context,
+            const rune_vm::DataView<const char> mimeType,
+            const rune_vm::DataView<const uint8_t> modelData,
+            const std::vector<std::string> inputs,
+            const std::vector<std::string> outputs) noexcept;
+
     TResult tfmModelInvoke(
         HostContext* context,
         const TModelId modelId,
         const rune_vm::DataView<const uint8_t> input,
         const rune_vm::DataView<uint8_t> output) noexcept;
+
+    TResult runeModelInfer(HostContext* context,
+            const TModelId modelId,
+            const rune_vm::WasmPtr inputs,
+            rune_vm::WasmPtr outputs) noexcept;
 
     // // Output helpers
     TOutputId requestOutput(HostContext* context, const rune_interop::OutputType outputType) noexcept;
@@ -81,30 +95,4 @@ namespace rune_vm_internal::host_functions {
 
     // // Debug helpers
     TResult debug(HostContext* context, const rune_vm::DataView<const char> message) noexcept;
-
-    // Link wasm names to actual functions
-    template<auto name>
-    constexpr auto nameToFunctionMap() noexcept {
-        constexpr auto stringViewName = std::string_view(name);
-
-        if constexpr(stringViewName == rune_interop::host_function_rune_name::g_requestCapability)
-            return requestCapability;
-        else if constexpr(stringViewName == rune_interop::host_function_rune_name::g_requestCapabilitySetParam)
-            return requestCapabilitySetParam;
-        else if constexpr(stringViewName == rune_interop::host_function_rune_name::g_requestProviderResponse)
-            return requestProviderResponse;
-        else if constexpr(stringViewName == rune_interop::host_function_rune_name::g_tfmPreloadModel)
-            return tfmPreloadModel;
-        else if constexpr(stringViewName == rune_interop::host_function_rune_name::g_tfmModelInvoke)
-            return tfmModelInvoke;
-        else if constexpr(stringViewName == rune_interop::host_function_rune_name::g_requestOutput)
-            return requestOutput;
-        else if constexpr(stringViewName == rune_interop::host_function_rune_name::g_consumeOutput)
-            return consumeOutput;
-        else if constexpr(stringViewName == rune_interop::host_function_rune_name::g_debug)
-            return debug;
-        else {
-            static_assert([](auto) { return false; }(stringViewName));
-        }
-    }
 }

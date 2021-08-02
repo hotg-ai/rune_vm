@@ -11,6 +11,7 @@
 #include <unordered_set>
 #include <type_traits>
 #include <variant>
+#include <optional>
 #include <rune_vm/DataView.hpp>
 #include <rune_vm/VirtualInterface.hpp>
 

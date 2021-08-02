@@ -30,10 +30,6 @@ namespace rune_vm_internal {
         [[nodiscard]] rune_vm::capabilities::IContext::Ptr getCapabilitiesContext() const noexcept final;
         [[nodiscard]] rune_vm::IResult::Ptr call() final;
 
-        // internal
-        template<auto functionName>
-        void link();
-
         // data
         rune_vm::LoggingModule m_log;
         std::shared_ptr<M3Module> m_module;
