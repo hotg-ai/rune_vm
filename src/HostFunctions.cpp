@@ -339,18 +339,18 @@ namespace rune_vm_internal::host_functions {
             auto model = context->modelManager()->getModel(modelId).value_or(nullptr);
 
             if (model) {
-                model->inputDescriptors.clear();
-                model->inputDescriptors.reserve(inputs.size());
+                model->inputs.clear();
+                model->inputs.reserve(inputs.size());
 
-                model->outputDescriptors.clear();
-                model->outputDescriptors.reserve(outputs.size());
+                model->outputs.clear();
+                model->outputs.reserve(outputs.size());
 
                 for (const auto& input: inputs) {
-                    model->inputDescriptors.push_back({input});
+                    model->inputs.push_back({nullptr, static_cast<uint32_t>(rune_vm_internal::inference::IModel::tensorSize(input))});
                 }
 
                 for (const auto& output: outputs) {
-                    model->outputDescriptors.push_back({output});
+                    model->outputs.push_back({nullptr, static_cast<uint32_t>(rune_vm_internal::inference::IModel::tensorSize(output))});
                 }
             }
         }
@@ -372,27 +372,22 @@ namespace rune_vm_internal::host_functions {
         auto model = context->modelManager()->getModel(modelId).value_or(nullptr);
 
         if (model) {
-            std::vector<rune_vm::DataView<const uint8_t>> inputTensors(model->inputDescriptors.size(), DataView<const uint8_t>());
-            std::vector<rune_vm::DataView<uint8_t>> outputTensors(model->outputDescriptors.size(), DataView<uint8_t>());
-
             //inputs.data() -> u8** in the wasm memory
             //so we go there to see what u8* lives there
             const u32* inputBase = (u32*)inputs.deref();
             const u32* outputBase = (u32*)outputs.deref();
 
-            for (size_t i = 0; i < inputTensors.size(); i++) {
-                inputTensors[i].m_data = static_cast<const uint8_t*>(inputs.deref(inputBase[i]));
-                inputTensors[i].m_size = model->inputDescriptors[i].byteCount();
+            for (size_t i = 0; i < model->inputs.size(); i++) {
+                model->inputs[i].m_data = static_cast<const uint8_t*>(inputs.deref(inputBase[i]));
             }
 
-            for (size_t i = 0; i < outputTensors.size(); i++) {
-                outputTensors[i].m_data = static_cast<uint8_t*>(outputs.deref(outputBase[i]));
-                outputTensors[i].m_size = model->outputDescriptors[i].byteCount();
+            for (size_t i = 0; i < model->outputs.size(); i++) {
+                model->outputs[i].m_data = static_cast<uint8_t*>(outputs.deref(outputBase[i]));
             }
 
             const auto runResult = context->modelManager()->runModel(modelId,
-                                                                     rune_vm::DataView<const rune_vm::DataView<const uint8_t>>(inputTensors.data(), inputTensors.size()),
-                                                                     rune_vm::DataView<rune_vm::DataView<uint8_t>> (outputTensors.data(), outputTensors.size()));
+                                                                     rune_vm::DataView<const rune_vm::DataView<const uint8_t>>(model->inputs.data(), model->inputs.size()),
+                                                                     rune_vm::DataView<rune_vm::DataView<uint8_t>> (model->outputs.data(), model->outputs.size()));
             if(!runResult) {
                 context->log().log(Severity::Error, fmt::format("rune_model_infer: failed to run model id={}", modelId));
                 return rune_interop::RC_InputError;
